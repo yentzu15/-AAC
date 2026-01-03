@@ -1,0 +1,7 @@
+{
+  "name": "Gemini AAC - AI Visual Communicator",
+  "description": "An advanced Augmentative and Alternative Communication (AAC) tool powered by Gemini, allowing users to communicate through symbols and dynamically edit communication tiles using AI-driven image generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
