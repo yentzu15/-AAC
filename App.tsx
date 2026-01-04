@@ -104,6 +104,14 @@ const App: React.FC = () => {
     })));
   };
 
+  const deleteTile = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (window.confirm('確定要刪除此詞彙嗎？')) {
+      setBoards(prev => prev.map(b => b.id === activeBoardId ? { ...b, tiles: b.tiles.filter(t => t.id !== id) } : b));
+      speakText('已刪除詞彙');
+    }
+  };
+
   const handleFullSpeak = () => {
     const sentenceText = sentence.map(t => t.text).join('');
     const fullText = sentenceText + keyboardText;
@@ -166,12 +174,25 @@ const App: React.FC = () => {
     }
   };
 
+  const deleteCurrentBoard = () => {
+    if (boards.length <= 1) {
+      alert('至少需要保留一個版面，無法刪除。');
+      return;
+    }
+    if (window.confirm(`確定要刪除「${activeBoard.name}」整個版面嗎？此動作無法復原。`)) {
+      const remainingBoards = boards.filter(b => b.id !== activeBoardId);
+      setBoards(remainingBoards);
+      setActiveBoardId(remainingBoards[0].id);
+      setCurrentPage(0);
+      speakText('版面已刪除');
+    }
+  };
+
   const addNewTile = () => {
     const newId = `custom-tile-${Date.now()}`;
     const newTile: AACTile = { id: newId, text: '新詞彙', imageUrl: '' };
     setBoards(prev => prev.map(b => b.id === activeBoardId ? { ...b, tiles: [...b.tiles, newTile] } : b));
     
-    // 跳轉到最後一頁以顯示新詞彙
     const newTotalTiles = activeBoard.tiles.length + 1;
     const newTotalPages = Math.ceil(newTotalTiles / TILES_PER_PAGE);
     setCurrentPage(newTotalPages - 1);
@@ -265,6 +286,7 @@ const App: React.FC = () => {
             placeholder="打字區..." 
             className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 font-bold w-48 focus:border-indigo-300 outline-none transition-all shadow-sm" 
           />
+          <button onClick={() => setSentence(prev => prev.slice(0, -1))} className="px-5 bg-amber-100 text-amber-700 rounded-2xl font-black h-full active:bg-amber-200 hover:bg-amber-200 transition-colors">退格</button>
           <button onClick={() => {setSentence([]); setKeyboardText('');}} className="px-5 bg-slate-200 text-slate-600 rounded-2xl font-black h-full active:bg-slate-300 hover:bg-slate-300 transition-colors">清除</button>
           <button onClick={handleFullSpeak} className="px-12 bg-indigo-600 text-white rounded-2xl font-black text-2xl h-full shadow-lg active:scale-95 hover:bg-indigo-700 transition-all">發聲</button>
         </div>
@@ -293,6 +315,16 @@ const App: React.FC = () => {
               onClick={() => handleTileClick(tile)} 
               className={`relative rounded-[2.5rem] shadow-lg border-4 flex flex-col items-center justify-center p-4 transition-all ${mode === 'edit' ? 'bg-amber-50 border-amber-300' : 'bg-white border-white active:scale-95 cursor-pointer hover:shadow-2xl'}`}
             >
+              {/* 刪除詞彙按鈕 */}
+              {mode === 'edit' && (
+                <button 
+                  onClick={(e) => deleteTile(tile.id, e)}
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 z-50 font-black"
+                >
+                  ✕
+                </button>
+              )}
+
               <div className="flex-grow w-full flex items-center justify-center min-h-0 relative">
                 {tile.imageUrl ? (
                   <img src={tile.imageUrl} className="max-h-full max-w-full object-contain pointer-events-none" />
@@ -365,6 +397,7 @@ const App: React.FC = () => {
         
         {mode === 'edit' ? (
           <div className="flex gap-2">
+            <button onClick={deleteCurrentBoard} className="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors shadow-sm">刪除此版面</button>
             <button onClick={addNewBoard} className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm">新增版面</button>
             <button onClick={addNewTile} className="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm">新增詞彙</button>
             <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定</button>
