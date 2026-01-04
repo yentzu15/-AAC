@@ -79,7 +79,6 @@ const App: React.FC = () => {
     return activeBoard.tiles.slice(start, start + TILES_PER_PAGE);
   }, [activeBoard, currentPage]);
 
-  // 同步變動至 LocalStorage，確保「記死」使用者的變更
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(boards));
   }, [boards]);
@@ -142,6 +141,7 @@ const App: React.FC = () => {
           const imported = JSON.parse(event.target?.result as string);
           if (Array.isArray(imported)) {
             setBoards(imported);
+            setActiveBoardId(imported[0]?.id || 'board-core');
             speakText('匯入完成');
           } else {
             alert('檔案格式不符，請上傳正確的 AAC 備份檔。');
@@ -153,6 +153,30 @@ const App: React.FC = () => {
       reader.readAsText(file);
     };
     input.click();
+  };
+
+  const addNewBoard = () => {
+    const name = window.prompt('請輸入新版面的名稱：', '新版面');
+    if (name && name.trim()) {
+      const newId = `custom-board-${Date.now()}`;
+      setBoards(prev => [...prev, { id: newId, name: name.trim(), tiles: [] }]);
+      setActiveBoardId(newId);
+      setCurrentPage(0);
+      speakText(`已新增版面 ${name}`);
+    }
+  };
+
+  const addNewTile = () => {
+    const newId = `custom-tile-${Date.now()}`;
+    const newTile: AACTile = { id: newId, text: '新詞彙', imageUrl: '' };
+    setBoards(prev => prev.map(b => b.id === activeBoardId ? { ...b, tiles: [...b.tiles, newTile] } : b));
+    
+    // 跳轉到最後一頁以顯示新詞彙
+    const newTotalTiles = activeBoard.tiles.length + 1;
+    const newTotalPages = Math.ceil(newTotalTiles / TILES_PER_PAGE);
+    setCurrentPage(newTotalPages - 1);
+    
+    speakText('已新增詞彙');
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,7 +229,10 @@ const App: React.FC = () => {
               onClick={() => {setActiveBoardId(b.id); setCurrentPage(0);}} 
               className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm border-2 whitespace-nowrap transition-all ${activeBoardId === b.id ? 'bg-indigo-600 text-white border-indigo-500 shadow-md' : 'bg-slate-50 text-slate-600 border-slate-50 hover:border-slate-200'}`}
             >
-              {BOARD_ICONS[b.id]} {b.name}
+              {BOARD_ICONS[b.id] || (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" /></svg>
+              )} 
+              {b.name}
             </button>
           ))}
         </div>
@@ -253,7 +280,6 @@ const App: React.FC = () => {
           </button>
           <div className="text-[12px] text-slate-400 font-black text-center mt-1">高高老師語你在一起</div>
           
-          {/* 設定高度為 h-[12vh]，與「下一個版面」一致 */}
           <button onClick={() => changeBoard('prev')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 mt-auto hover:bg-indigo-100 transition-colors">
             <span className="text-[10px] font-black uppercase text-center">上一個<br/>版面</span>
           </button>
@@ -271,7 +297,10 @@ const App: React.FC = () => {
                 {tile.imageUrl ? (
                   <img src={tile.imageUrl} className="max-h-full max-w-full object-contain pointer-events-none" />
                 ) : (
-                  <span className="text-slate-200 font-black text-4xl">?</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    {mode === 'edit' && <span className="text-slate-400 text-xs font-bold">點擊新增圖片</span>}
+                  </div>
                 )}
                 {mode === 'edit' && (
                   <div className="absolute inset-0 bg-black/5 pointer-events-none flex items-center justify-center rounded-[2.5rem]">
@@ -335,10 +364,12 @@ const App: React.FC = () => {
         </div>
         
         {mode === 'edit' ? (
-          <div className="flex gap-4">
-            <button onClick={importSettings} className="bg-slate-800 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定(.json)</button>
-            <button onClick={exportSettings} className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">匯出備份(.json)</button>
-            <button onClick={() => setMode('standard')} className="bg-green-600 text-white px-10 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition-colors shadow-sm">完成儲存</button>
+          <div className="flex gap-2">
+            <button onClick={addNewBoard} className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm">新增版面</button>
+            <button onClick={addNewTile} className="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm">新增詞彙</button>
+            <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定</button>
+            <button onClick={exportSettings} className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">匯出備份</button>
+            <button onClick={() => setMode('standard')} className="bg-green-600 text-white px-8 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition-colors shadow-sm">完成儲存</button>
           </div>
         ) : (
           <div className="text-[10px] font-bold text-slate-300">
