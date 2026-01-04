@@ -64,7 +64,7 @@ const STORAGE_KEY = 'gemini-aac-persistent-v5';
 const TILES_PER_PAGE = 9;
 
 const App: React.FC = () => {
-  const isMobile = window.innerWidth < 768;
+const isMobile = window.matchMedia("(max-width: 768px)").matches;
   
   const [boards, setBoards] = useState<AACBoard[]>(() => {
     try {
@@ -337,9 +337,12 @@ const App: React.FC = () => {
                 </button>
               )}
 
-              <div className="flex-grow w-full flex items-center justify-center min-h-0 relative">
+<div className={`w-full flex items-center justify-center relative ${isMobile ? "h-[70%]" : "flex-grow min-h-0"}`}>
                 {tile.imageUrl ? (
-                  <img src={tile.imageUrl} className="max-h-full max-w-full object-contain pointer-events-none" />
+<img
+  src={tile.imageUrl}
+  className={`${isMobile ? "h-full w-full" : "max-h-full max-w-full"} object-contain pointer-events-none`}
+/>
                 ) : (
                   <div className="flex flex-col items-center gap-2">
                     <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -362,7 +365,10 @@ const App: React.FC = () => {
                   className="font-black text-indigo-600 text-2xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none focus:bg-white transition-all"
                 />
               ) : (
-                <span className="font-black text-black text-3xl mt-2">{tile.text}</span>
+                <span className={`font-black text-black mt-2 ${isMobile ? "text-xl" : "text-3xl"} leading-tight text-center`}>
+  {tile.text}
+</span>
+
               )}
             </div>
           ))}
