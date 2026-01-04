@@ -23,19 +23,19 @@ const INITIAL_BOARDS: AACBoard[] = [
     id: 'board-core',
     name: '核心詞彙',
     tiles: [
-            { id: '11', text: '我', imageUrl: '/icons/我.png' },
+      { id: '11', text: '我', imageUrl: '/icons/我.png' },
       { id: '12', text: '你', imageUrl: '/icons/你.png' },
-        { id: '2', text: '要', imageUrl: '/icons/還要.png' },
-      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },    
+      { id: '2', text: '要', imageUrl: '/icons/還要.png' },
+      { id: '13', text: '去', imageUrl: '/icons/去.png' },
+      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
       { id: '7', text: '玩', imageUrl: '/icons/玩.png' },
       { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
-{ id: '1', text: '打開', imageUrl: '/icons/打開.png' },
+      { id: '1', text: '打開', imageUrl: '/icons/打開.png' },
       { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
       { id: '8', text: '關起來', imageUrl: '/icons/關起來.png' },
-      { id: '9', text: '換', imageUrl: '/icons/換.png' }
+      { id: '9', text: '換', imageUrl: '/icons/換.png' },
       { id: '5', text: '請', imageUrl: '/icons/請.png' },
-      { id: '7', text: '放', imageUrl: '/icons/玩.png' },
-
+      { id: '10', text: '放', imageUrl: '/icons/放.png' }
     ]
   },
   {
@@ -61,15 +61,26 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'd5', text: '上廁所', imageUrl: '/icons/上廁所.png' },
       { id: 'd6', text: '穿衣服', imageUrl: '/icons/穿衣服.png' }
     ]
-  }
-];
- id: 'board-toys',
+  },
+  {
+    id: 'board-food',
     name: '食物',
     tiles: [
-      { id: 'da1', text: '水', imageUrl: '/icons/水.png' },
-      { id: 'da2', text: '飯', imageUrl: '/icons/飯.png' },
-      { id: 'da3', text: '餅乾', imageUrl: '/icons/餅乾.png' },
-    
+      { id: 'f1', text: '水', imageUrl: '/icons/水.png' },
+      { id: 'f2', text: '飯', imageUrl: '/icons/飯.png' },
+      { id: 'f3', text: '餅乾', imageUrl: '/icons/餅乾.png' }
+    ]
+  },
+  {
+    id: 'board-places',
+    name: '地點',
+    tiles: [
+      { id: 'p1', text: '學校', imageUrl: '/icons/學校.png' },
+      { id: 'p2', text: '家', imageUrl: '/icons/家.png' },
+      { id: 'p3', text: '公園', imageUrl: '/icons/公園.png' },
+      { id: 'p4', text: '健身房', imageUrl: '/icons/健身房.png' },
+      { id: 'p5', text: '出去玩', imageUrl: '/icons/出去玩.png' },
+      { id: 'p6', text: '醫院', imageUrl: '/icons/醫院.png' }
     ]
   }
 ];
