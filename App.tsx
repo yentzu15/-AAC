@@ -23,15 +23,19 @@ const INITIAL_BOARDS: AACBoard[] = [
     id: 'board-core',
     name: '核心詞彙',
     tiles: [
-      { id: '1', text: '打開', imageUrl: '/icons/打開.png' },
-      { id: '2', text: '要', imageUrl: '/icons/還要.png' },
-      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
-      { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
-      { id: '5', text: '請', imageUrl: '/icons/請.png' },
-      { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
+            { id: '11', text: '我', imageUrl: '/icons/我.png' },
+      { id: '12', text: '你', imageUrl: '/icons/你.png' },
+        { id: '2', text: '要', imageUrl: '/icons/還要.png' },
+      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },    
       { id: '7', text: '玩', imageUrl: '/icons/玩.png' },
+      { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
+{ id: '1', text: '打開', imageUrl: '/icons/打開.png' },
+      { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
       { id: '8', text: '關起來', imageUrl: '/icons/關起來.png' },
       { id: '9', text: '換', imageUrl: '/icons/換.png' }
+      { id: '5', text: '請', imageUrl: '/icons/請.png' },
+      { id: '7', text: '放', imageUrl: '/icons/玩.png' },
+
     ]
   },
   {
@@ -59,7 +63,16 @@ const INITIAL_BOARDS: AACBoard[] = [
     ]
   }
 ];
-
+ id: 'board-toys',
+    name: '食物',
+    tiles: [
+      { id: 'da1', text: '水', imageUrl: '/icons/水.png' },
+      { id: 'da2', text: '飯', imageUrl: '/icons/飯.png' },
+      { id: 'da3', text: '餅乾', imageUrl: '/icons/餅乾.png' },
+    
+    ]
+  }
+];
 const STORAGE_KEY = 'gemini-aac-persistent-v5';
 const TILES_PER_PAGE = 9;
 
