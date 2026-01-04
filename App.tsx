@@ -209,7 +209,7 @@ const App: React.FC = () => {
         img.src = reader.result as string;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 300; 
+          const MAX_SIZE = 120; 
           let width = img.width;
           let height = img.height;
           if (width > height) {
@@ -222,7 +222,7 @@ const App: React.FC = () => {
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
             setBoards(prev => prev.map(b => ({
               ...b,
               tiles: b.tiles.map(t => t.id === editingTileId ? { ...t, imageUrl: compressedBase64 } : t)
