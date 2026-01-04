@@ -24,7 +24,7 @@ const INITIAL_BOARDS: AACBoard[] = [
     name: '核心詞彙',
     tiles: [
       { id: '1', text: '打開', imageUrl: '/icons/打開.png' },
-      { id: '2', text: '還要', imageUrl: '/icons/還要.png' },
+      { id: '2', text: '要', imageUrl: '/icons/還要.png' },
       { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
       { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
       { id: '5', text: '請', imageUrl: '/icons/請.png' },
@@ -64,6 +64,8 @@ const STORAGE_KEY = 'gemini-aac-persistent-v5';
 const TILES_PER_PAGE = 9;
 
 const App: React.FC = () => {
+  const isMobile = window.innerWidth < 768;
+  
   const [boards, setBoards] = useState<AACBoard[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -318,7 +320,7 @@ const App: React.FC = () => {
         </aside>
 
         {/* Main 3x3 Grid */}
-        <main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4">
+<main className={`flex-grow p-3 md:p-4 grid gap-3 md:gap-4 ${isMobile ? 'grid-cols-2 auto-rows-fr' : 'grid-cols-3 grid-rows-3'}`}>
           {visibleTiles.map(tile => (
             <div 
               key={tile.id} 
