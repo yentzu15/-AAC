@@ -105,6 +105,8 @@ const isMobile = window.matchMedia("(max-width: 768px)").matches;
   const [sentence, setSentence] = useState<AACTile[]>([]);
   const [keyboardText, setKeyboardText] = useState(() => localStorage.getItem(`${STORAGE_KEY}-kbd`) || '');
   const [editingTileId, setEditingTileId] = useState<string | null>(null);
+  const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeBoard = useMemo(() => boards.find(b => b.id === activeBoardId) || boards[0], [boards, activeBoardId]);
@@ -147,6 +149,26 @@ const isMobile = window.matchMedia("(max-width: 768px)").matches;
       speakText('已刪除詞彙');
     }
   };
+const moveTile = (fromId: string, toId: string) => {
+  if (fromId === toId) return;
+
+  setBoards(prev =>
+    prev.map(board => {
+      if (board.id !== activeBoardId) return board;
+
+      const tiles = [...board.tiles];
+      const fromIndex = tiles.findIndex(t => t.id === fromId);
+      const toIndex = tiles.findIndex(t => t.id === toId);
+
+      if (fromIndex === -1 || toIndex === -1) return board;
+
+      const [moved] = tiles.splice(fromIndex, 1);
+      tiles.splice(toIndex, 0, moved);
+
+      return { ...board, tiles };
+    })
+  );
+};
 
   const handleFullSpeak = () => {
     const sentenceText = sentence.map(t => t.text).join('');
