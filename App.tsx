@@ -23,29 +23,39 @@ const INITIAL_BOARDS: AACBoard[] = [
     id: 'board-core',
     name: '核心詞彙',
     tiles: [
-      { id: '1', text: '打開', imageUrl: 'https://img.icons8.com/color/96/open-box.png' }, { id: '2', text: '還要', imageUrl: 'https://img.icons8.com/color/96/plus--v1.png' },
-      { id: '3', text: '給我', imageUrl: 'https://img.icons8.com/color/96/hand-holding-heart.png' }, { id: '4', text: '再一次', imageUrl: 'https://img.icons8.com/color/96/replay.png' },
-      { id: '5', text: '請', imageUrl: 'https://img.icons8.com/color/96/praying-hands.png' }, { id: '6', text: '幫忙', imageUrl: 'https://img.icons8.com/color/96/help.png' },
-      { id: '7', text: '玩', imageUrl: 'https://img.icons8.com/color/96/controller.png' }, { id: '8', text: '關起來', imageUrl: 'https://img.icons8.com/color/96/close-window.png' },
-      { id: '9', text: '換', imageUrl: 'https://img.icons8.com/color/96/sorting-arrows.png' }
+      { id: '1', text: '打開', imageUrl: '/icons/打開.png' },
+      { id: '2', text: '還要', imageUrl: '/icons/還要.png' },
+      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
+      { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
+      { id: '5', text: '請', imageUrl: '/icons/請.png' },
+      { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
+      { id: '7', text: '玩', imageUrl: '/icons/玩.png' },
+      { id: '8', text: '關起來', imageUrl: '/icons/關起來.png' },
+      { id: '9', text: '換', imageUrl: '/icons/換.png' }
     ]
   },
   {
     id: 'board-emotions',
     name: '情緒表達',
     tiles: [
-      { id: 'e1', text: '開心', imageUrl: 'https://img.icons8.com/color/96/happy.png' }, { id: 'e2', text: '生氣', imageUrl: 'https://img.icons8.com/color/96/angry.png' },
-      { id: 'e3', text: '難過', imageUrl: 'https://img.icons8.com/color/96/sad.png' }, { id: 'e4', text: '害怕', imageUrl: 'https://img.icons8.com/color/96/shocked.png' },
-      { id: 'e5', text: '累了', imageUrl: 'https://img.icons8.com/color/96/tired.png' }, { id: 'e6', text: '痛痛', imageUrl: 'https://img.icons8.com/color/96/bandage.png' }
+      { id: 'e1', text: '開心', imageUrl: '/icons/開心.png' },
+      { id: 'e2', text: '生氣', imageUrl: '/icons/生氣.png' },
+      { id: 'e3', text: '難過', imageUrl: '/icons/傷心.png' },
+      { id: 'e4', text: '害怕', imageUrl: '/icons/怕.png' },
+      { id: 'e5', text: '累了', imageUrl: '/icons/累.png' },
+      { id: 'e6', text: '痛痛', imageUrl: '/icons/痛.png' }
     ]
   },
   {
     id: 'board-daily',
     name: '日常活動',
     tiles: [
-      { id: 'd1', text: '吃', imageUrl: 'https://img.icons8.com/color/96/rice-bowl.png' }, { id: 'd2', text: '喝', imageUrl: 'https://img.icons8.com/color/96/water-glass.png' },
-      { id: 'd3', text: '睡覺', imageUrl: 'https://img.icons8.com/color/96/sleeping-in-bed.png' }, { id: 'd4', text: '洗澡', imageUrl: 'https://img.icons8.com/color/96/shower.png' },
-      { id: 'd5', text: '上廁所', imageUrl: 'https://img.icons8.com/color/96/toilet.png' }, { id: 'd6', text: '穿衣服', imageUrl: 'https://img.icons8.com/color/96/t-shirt.png' }
+      { id: 'd1', text: '吃', imageUrl: '/icons/吃.png' },
+      { id: 'd2', text: '喝', imageUrl: '/icons/喝.png' },
+      { id: 'd3', text: '睡覺', imageUrl: '/icons/睡覺.png' },
+      { id: 'd4', text: '洗澡', imageUrl: '/icons/洗澡.png' },
+      { id: 'd5', text: '上廁所', imageUrl: '/icons/上廁所.png' },
+      { id: 'd6', text: '穿衣服', imageUrl: '/icons/穿衣服.png' }
     ]
   }
 ];
