@@ -300,7 +300,7 @@ const App: React.FC = () => {
             <img src={YES_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
             <span className="font-black text-green-600 text-4xl">是</span>
           </button>
-          <div className="text-[12px] text-slate-400 font-black text-center mt-1">高高老師語你在一起</div>
+          <div className="text-[16px] text-slate-400 font-black text-center mt-1">高高老師語你在一起</div>
           
           <button onClick={() => changeBoard('prev')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 mt-auto hover:bg-indigo-100 transition-colors">
             <span className="text-[10px] font-black uppercase text-center">上一個<br/>版面</span>
