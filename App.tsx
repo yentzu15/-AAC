@@ -26,18 +26,18 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: '11', text: '我', imageUrl: '/icons/我.png' },
       { id: '12', text: '你', imageUrl: '/icons/你.png' },
       { id: '2', text: '要', imageUrl: '/icons/還要.png' },
-      { id: '13', text: '去', imageUrl: '/icons/去.png' },
-      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
-      { id: '7', text: '玩', imageUrl: '/icons/玩.png' },
+      { id: '14', text: '翻頁', imageUrl: '/icons/翻頁.png' }, 
+      { id: '10', text: '放', imageUrl: '/icons/放.png' },
       { id: '4', text: '再一次', imageUrl: '/icons/再一次.png' },
+      { id: '7', text: '玩', imageUrl: '/icons/玩.png' },
       { id: '1', text: '打開', imageUrl: '/icons/打開.png' },
-      { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
+      { id: '3', text: '給我', imageUrl: '/icons/給我.png' },
+      { id: '15', text: '完成', imageUrl: '/icons/完成.png' },
+     { id: '6', text: '幫忙', imageUrl: '/icons/幫忙.png' },
       { id: '8', text: '關起來', imageUrl: '/icons/關起來.png' },
       { id: '9', text: '換', imageUrl: '/icons/換.png' },
       { id: '5', text: '請', imageUrl: '/icons/請.png' },
-      { id: '10', text: '放', imageUrl: '/icons/放.png' },
-      { id: '14', text: '翻頁', imageUrl: '/icons/翻頁.png' },
-      { id: '15', text: '完成', imageUrl: '/icons/完成.png' }
+      { id: '13', text: '去', imageUrl: '/icons/去.png' }
     ]
   },
 
