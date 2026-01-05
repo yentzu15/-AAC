@@ -47,7 +47,18 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'e3', text: '難過', imageUrl: '/icons/傷心.png' },
       { id: 'e4', text: '害怕', imageUrl: '/icons/怕.png' },
       { id: 'e5', text: '累了', imageUrl: '/icons/累.png' },
-      { id: 'e6', text: '痛痛', imageUrl: '/icons/痛.png' }
+      { id: 'e6', text: '痛痛', imageUrl: '/icons/痛.png' },
+      {
+  id: '14',
+  text: '翻頁',
+  imageUrl: '/icons/翻頁.png'
+},
+{
+  id: '15',
+  text: '完成',
+  imageUrl: '/icons/完成.png'
+}
+
     ]
   },
   {
@@ -377,10 +388,23 @@ const moveTile = (fromId: string, toId: string) => {
             <img src={YES_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
             <span className="font-black text-green-600 text-4xl">是</span>
           </button>
-          <div className="text-[20px] text-slate-400 font-black text-center mt-1">高高老師語你在一起</div>
+         <div className="mt-1 flex flex-col items-center gap-1">
+  <div className="text-[20px] text-slate-400 font-black text-center">
+    高高老師語你在一起
+  </div>
+
+  <img
+    src="/icons/logo.png"
+    alt="logo"
+    className="w-[56px] opacity-50 pointer-events-none"
+  />
+</div>
+
           
           <button onClick={() => changeBoard('prev')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 mt-auto hover:bg-indigo-100 transition-colors">
-            <span className="text-[30px] font-black uppercase text-center">上一版<br/> < /<spanp
+<span className="text-[36px] font-black text-center">
+  &lt;&lt;
+</span>
           </button>
         </aside>
 
@@ -489,7 +513,9 @@ const moveTile = (fromId: string, toId: string) => {
 </div>
 
           <button onClick={() => changeBoard('next')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors">
-            <span className="text-[30px] font-black uppercase text-center">下一版<br/> > />spanp
+<span className="text-[36px] font-black text-center">
+  &gt;&gt;
+</span>
           </button>
         </aside>
       </div>
