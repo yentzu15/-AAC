@@ -91,26 +91,59 @@ const INITIAL_BOARDS: AACBoard[] = [
   }
 ];
 
-const STORAGE_KEY = 'gemini-aac-persistent-v5';
+const BOARDS_KEY = 'gemini-aac-boards-v1';
+const UI_KEY = 'gemini-aac-ui-v2';
+const UI_VERSION = 2;
+
 const TILES_PER_PAGE = 9;
 
 const App: React.FC = () => {
-const isMobile = window.matchMedia("(max-width: 768px)").matches;
+ const isMobile = window.matchMedia("(max-width: 768px)").matches;
+ const ui = loadUI();
+
   
   const [boards, setBoards] = useState<AACBoard[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : INITIAL_BOARDS;
-    } catch (e) {
-      return INITIAL_BOARDS;
-    }
-  });
+  try {
+    const saved = localStorage.getItem(BOARDS_KEY);
+    return saved ? JSON.parse(saved) : INITIAL_BOARDS;
+  } catch {
+    return INITIAL_BOARDS;
+  }
+});
+type UIState = {
+  version: number;
+  activeBoardId: string;
+  currentPage: number;
+  mode: LayoutMode;
+  keyboardText: string;
+};
 
-  const [activeBoardId, setActiveBoardId] = useState<string>(boards[0]?.id || 'board-core');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [mode, setMode] = useState<LayoutMode>('standard');
+const DEFAULT_UI: UIState = {
+  version: UI_VERSION,
+  activeBoardId: 'board-core',
+  currentPage: 0,
+  mode: 'standard',
+  keyboardText: '',
+};
+
+const loadUI = (): UIState => {
+  try {
+    const raw = localStorage.getItem(UI_KEY);
+    if (!raw) return DEFAULT_UI;
+    const parsed = JSON.parse(raw) as UIState;
+    if (parsed?.version !== UI_VERSION) return DEFAULT_UI;
+    return { ...DEFAULT_UI, ...parsed, version: UI_VERSION };
+  } catch {
+    return DEFAULT_UI;
+  }
+};
+
+
+  const [activeBoardId, setActiveBoardId] = useState<string>(ui.activeBoardId);
+const [currentPage, setCurrentPage] = useState(ui.currentPage);
+const [mode, setMode] = useState<LayoutMode>(ui.mode);
   const [sentence, setSentence] = useState<AACTile[]>([]);
-  const [keyboardText, setKeyboardText] = useState(() => localStorage.getItem(`${STORAGE_KEY}-kbd`) || '');
+const [keyboardText, setKeyboardText] = useState(ui.keyboardText);
   const [editingTileId, setEditingTileId] = useState<string | null>(null);
   const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
 
@@ -124,13 +157,17 @@ const isMobile = window.matchMedia("(max-width: 768px)").matches;
     return activeBoard.tiles.slice(start, start + TILES_PER_PAGE);
   }, [activeBoard, currentPage]);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(boards));
-  }, [boards]);
+ useEffect(() => {
+  const nextUI: UIState = {
+    version: UI_VERSION,
+    activeBoardId,
+    currentPage,
+    mode,
+    keyboardText,
+  };
+  localStorage.setItem(UI_KEY, JSON.stringify(nextUI));
+}, [activeBoardId, currentPage, mode, keyboardText]);
 
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_KEY}-kbd`, keyboardText);
-  }, [keyboardText]);
 
   const handleTileClick = (tile: AACTile) => {
     if (mode === 'standard') {
