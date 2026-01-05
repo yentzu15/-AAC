@@ -35,9 +35,14 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: '8', text: '關起來', imageUrl: '/icons/關起來.png' },
       { id: '9', text: '換', imageUrl: '/icons/換.png' },
       { id: '5', text: '請', imageUrl: '/icons/請.png' },
-      { id: '10', text: '放', imageUrl: '/icons/放.png' }
+      { id: '10', text: '放', imageUrl: '/icons/放.png' },
+
+      // 你要的兩個詞彙（只有顯示，沒有綁功能）
+      { id: '14', text: '翻頁', imageUrl: '/icons/翻頁.png' },
+      { id: '15', text: '完成', imageUrl: '/icons/完成.png' }
     ]
   },
+
   {
     id: 'board-emotions',
     name: '情緒表達',
@@ -47,20 +52,10 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'e3', text: '難過', imageUrl: '/icons/傷心.png' },
       { id: 'e4', text: '害怕', imageUrl: '/icons/怕.png' },
       { id: 'e5', text: '累了', imageUrl: '/icons/累.png' },
-      { id: 'e6', text: '痛痛', imageUrl: '/icons/痛.png' },
-      {
-  id: '14',
-  text: '翻頁',
-  imageUrl: '/icons/翻頁.png'
-},
-{
-  id: '15',
-  text: '完成',
-  imageUrl: '/icons/完成.png'
-}
-
+      { id: 'e6', text: '痛痛', imageUrl: '/icons/痛.png' }
     ]
   },
+
   {
     id: 'board-daily',
     name: '日常活動',
@@ -73,6 +68,7 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'd6', text: '穿衣服', imageUrl: '/icons/穿衣服.png' }
     ]
   },
+
   {
     id: 'board-food',
     name: '食物',
@@ -82,6 +78,7 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'f3', text: '餅乾', imageUrl: '/icons/餅乾.png' }
     ]
   },
+
   {
     id: 'board-places',
     name: '地點',
@@ -95,6 +92,7 @@ const INITIAL_BOARDS: AACBoard[] = [
     ]
   }
 ];
+
 const STORAGE_KEY = 'gemini-aac-persistent-v5';
 const TILES_PER_PAGE = 9;
 
