@@ -169,6 +169,25 @@ const moveTile = (fromId: string, toId: string) => {
     })
   );
 };
+  const moveTileByStep = (tileId: string, step: -1 | 1) => {
+  setBoards(prev =>
+    prev.map(board => {
+      if (board.id !== activeBoardId) return board;
+
+      const tiles = [...board.tiles];
+      const idx = tiles.findIndex(t => t.id === tileId);
+      if (idx === -1) return board;
+
+      const newIdx = idx + step;
+      if (newIdx < 0 || newIdx >= tiles.length) return board;
+
+      [tiles[idx], tiles[newIdx]] = [tiles[newIdx], tiles[idx]];
+
+      return { ...board, tiles };
+    })
+  );
+};
+
 
   const handleFullSpeak = () => {
     const sentenceText = sentence.map(t => t.text).join('');
@@ -361,7 +380,7 @@ const moveTile = (fromId: string, toId: string) => {
           <div className="text-[20px] text-slate-400 font-black text-center mt-1">高高老師語你在一起</div>
           
           <button onClick={() => changeBoard('prev')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 mt-auto hover:bg-indigo-100 transition-colors">
-            <span className="text-[20px] font-black uppercase text-center">上一個<br/>版面</span>
+            <span className="text-[30px] font-black uppercase text-center">上一版<br/> < /<spanp
           </button>
         </aside>
 
@@ -382,6 +401,28 @@ const moveTile = (fromId: string, toId: string) => {
                   ✕
                 </button>
               )}
+{mode === 'edit' && (
+  <div className="absolute bottom-2 right-2 flex gap-1 z-50">
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        moveTileByStep(tile.id, -1);
+      }}
+      className="px-2 py-1 text-xs bg-slate-200 rounded hover:bg-slate-300"
+    >
+      ↑
+    </button>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        moveTileByStep(tile.id, 1);
+      }}
+      className="px-2 py-1 text-xs bg-slate-200 rounded hover:bg-slate-300"
+    >
+      ↓
+    </button>
+  </div>
+)}
 
 <div className={`w-full flex items-center justify-center relative ${isMobile ? "h-[70%]" : "flex-grow min-h-0"}`}>
                 {tile.imageUrl ? (
@@ -430,25 +471,25 @@ const moveTile = (fromId: string, toId: string) => {
             <span className="font-black text-red-600 text-4xl">不</span>
           </button>
           
-          <div className="flex-grow flex flex-col gap-2">
-            <button 
-              disabled={currentPage === 0} 
-              onClick={() => setCurrentPage(p => p - 1)} 
-              className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-xl"
-            >
-              上一頁
-            </button>
-            <button 
-              disabled={currentPage >= totalPages - 1} 
-              onClick={() => setCurrentPage(p => p + 1)} 
-              className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-xl"
-            >
-              下一頁
-            </button>
-          </div>
-          
+        <div className="flex-grow flex flex-col gap-2">
+  <button 
+    disabled={currentPage === 0} 
+    onClick={() => setCurrentPage(p => p - 1)} 
+    className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+  >
+    ↑
+  </button>
+  <button 
+    disabled={currentPage >= totalPages - 1} 
+    onClick={() => setCurrentPage(p => p + 1)} 
+    className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+  >
+    ↓
+  </button>
+</div>
+
           <button onClick={() => changeBoard('next')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors">
-            <span className="text-[20px] font-black uppercase text-center">下一個<br/>版面</span>
+            <span className="text-[30px] font-black uppercase text-center">下一版<br/> > />spanp
           </button>
         </aside>
       </div>
@@ -470,7 +511,7 @@ const moveTile = (fromId: string, toId: string) => {
           </div>
         ) : (
           <div className="text-[10px] font-bold text-slate-300">
-            POWERED BY GEMINI AI 高高老師
+            邱彥慈 語言治療師 製作
           </div>
         )}
       </footer>
