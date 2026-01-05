@@ -139,13 +139,18 @@ const loadUI = (): UIState => {
 };
 
 
-  const [activeBoardId, setActiveBoardId] = useState<string>(ui.activeBoardId);
-const [currentPage, setCurrentPage] = useState(ui.currentPage);
-const [mode, setMode] = useState<LayoutMode>(ui.mode);
-  const [sentence, setSentence] = useState<AACTile[]>([]);
-const [keyboardText, setKeyboardText] = useState(ui.keyboardText);
-  const [editingTileId, setEditingTileId] = useState<string | null>(null);
-  const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
+const ui = loadUI();
+
+const [activeBoardId, setActiveBoardId] = useState<string>(
+  ui.activeBoardId || boards[0]?.id || 'board-core'
+);
+const [currentPage, setCurrentPage] = useState<number>(ui.currentPage ?? 0);
+const [mode, setMode] = useState<LayoutMode>(ui.mode ?? 'standard');
+const [sentence, setSentence] = useState<AACTile[]>([]);
+const [keyboardText, setKeyboardText] = useState<string>(ui.keyboardText ?? '');
+const [editingTileId, setEditingTileId] = useState<string | null>(null);
+const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
+
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
