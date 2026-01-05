@@ -36,8 +36,6 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: '9', text: '換', imageUrl: '/icons/換.png' },
       { id: '5', text: '請', imageUrl: '/icons/請.png' },
       { id: '10', text: '放', imageUrl: '/icons/放.png' },
-
-      // 你要的兩個詞彙（只有顯示，沒有綁功能）
       { id: '14', text: '翻頁', imageUrl: '/icons/翻頁.png' },
       { id: '15', text: '完成', imageUrl: '/icons/完成.png' }
     ]
