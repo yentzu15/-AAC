@@ -422,7 +422,7 @@ const moveTile = (fromId: string, toId: string) => {
       <div className="flex-grow relative flex bg-slate-100 overflow-hidden">
         {/* Left Sidebar */}
 <aside className="w-[22vw] max-w-[320px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
-          <button onClick={() => handleTileClick(YES_TILE)} 
+          <button onClick={() => handleTileClick(YES_TILE)}> 
 className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
             <img src={YES_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
             <span className="font-black text-green-600 text-4xl">是</span>
@@ -529,7 +529,7 @@ className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-gre
 
         {/* Right Sidebar */}
         <aside className="w-[18vw] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
-          <button onClick={() => handleTileClick(NO_TILE)} 
+          <button onClick={() => handleTileClick(NO_TILE)}> 
 className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
             <img src={NO_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
             <span className="font-black text-red-600 text-4xl">不</span>
