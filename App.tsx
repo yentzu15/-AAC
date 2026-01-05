@@ -139,40 +139,11 @@ const App: React.FC = () => {
   useEffect(() => {
   localStorage.setItem(BOARDS_KEY, JSON.stringify(boards));
 }, [boards]);
-type UIState = {
-  version: number;
-  activeBoardId: string;
-  currentPage: number;
-  mode: LayoutMode;
-  keyboardText: string;
-};
-
-const DEFAULT_UI: UIState = {
-  version: UI_VERSION,
-  activeBoardId: 'board-core',
-  currentPage: 0,
-  mode: 'standard',
-  keyboardText: '',
-};
-
-const loadUI = (): UIState => {
-  try {
-    const raw = localStorage.getItem(UI_KEY);
-    if (!raw) return DEFAULT_UI;
-    const parsed = JSON.parse(raw) as UIState;
-    if (parsed?.version !== UI_VERSION) return DEFAULT_UI;
-    return { ...DEFAULT_UI, ...parsed, version: UI_VERSION };
-  } catch {
-    return DEFAULT_UI;
-  }
-};
-
 
 const ui = loadUI();
 
-const [activeBoardId, setActiveBoardId] = useState<string>(
-  ui.activeBoardId || boards[0]?.id || 'board-core'
-);
+const [activeBoardId, setActiveBoardId] = useState<string>(ui.activeBoardId || 'board-core');
+
 const [currentPage, setCurrentPage] = useState<number>(ui.currentPage ?? 0);
 const [mode, setMode] = useState<LayoutMode>(ui.mode ?? 'standard');
 const [sentence, setSentence] = useState<AACTile[]>([]);
