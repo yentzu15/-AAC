@@ -392,7 +392,7 @@ const moveTile = (fromId: string, toId: string) => {
   <img
     src="/icons/logo.png"
     alt="logo"
-    className="w-[56px] opacity-50 pointer-events-none"
+    className="w-[56px] opacity-70 pointer-events-none"
   />
 </div>
 
