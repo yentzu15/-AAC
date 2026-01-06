@@ -125,8 +125,6 @@ const loadUI = (): UIState => {
 };
 
 const App: React.FC = () => {
- const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
   
   const [boards, setBoards] = useState<AACBoard[]>(() => {
   try {
@@ -421,7 +419,7 @@ const moveTile = (fromId: string, toId: string) => {
       {/* Grid Area with Sidebars */}
       <div className="flex-grow relative flex bg-slate-100 overflow-hidden">
         {/* Left Sidebar */}
-<aside className="w-[22vw] max-w-[320px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
+<aside className="w-[320px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
          <button
   onClick={() => handleTileClick(YES_TILE)}
   className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
@@ -451,7 +449,7 @@ const moveTile = (fromId: string, toId: string) => {
         </aside>
 
         {/* Main 3x3 Grid */}
-<main className={`flex-grow p-3 md:p-4 grid gap-3 md:gap-4 ${isMobile ? 'grid-cols-2 auto-rows-fr' : 'grid-cols-3 grid-rows-3'}`}>
+<main className="flex-grow p-4 grid gap-4 grid-cols-3 grid-rows-3">
           {visibleTiles.map(tile => (
             <div 
               key={tile.id} 
@@ -494,8 +492,7 @@ const moveTile = (fromId: string, toId: string) => {
                 {tile.imageUrl ? (
 <img
   src={tile.imageUrl}
-  className={`${isMobile ? "h-full w-full" : "max-h-full max-w-full"} object-contain pointer-events-none`}
-/>
+className="h-full w-full object-contain pointer-events-none"/>
                 ) : (
                   <div className="flex flex-col items-center gap-2">
                     <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -531,14 +528,18 @@ const moveTile = (fromId: string, toId: string) => {
         </main>
 
         {/* Right Sidebar */}
-<aside className="w-[22vw] max-w-[320px] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
+<aside className="w-[320px] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
          <button
   onClick={() => handleTileClick(NO_TILE)}
   className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
 >
-  <img src={NO_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
+  <img
+    src={NO_TILE.imageUrl}
+    className="w-1/2 object-contain mb-2 pointer-events-none"
+  />
   <span className="font-black text-red-600 text-4xl">不</span>
 </button>
+
           
         <div className="flex-grow flex flex-col gap-2">
   <button 
