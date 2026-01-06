@@ -416,155 +416,130 @@ const moveTile = (fromId: string, toId: string) => {
         </div>
       </div>
 
-      {/* Grid Area with Sidebars */}
-      <div className="flex-grow relative flex bg-slate-100 overflow-hidden">
-        {/* Left Sidebar */}
-<aside className="w-[320px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
-         <button
-  onClick={() => handleTileClick(YES_TILE)}
-  className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
->
-  <img src={YES_TILE.imageUrl} className="w-1/2 object-contain mb-2 pointer-events-none" />
-  <span className="font-black text-green-600 text-4xl">是</span>
-</button>
+    {/* Grid Area */}
+<div className="flex-grow flex bg-slate-100 overflow-hidden">
 
-         <div className="mt-1 flex flex-col items-center gap-1">
-  <div className="text-[20px] text-slate-400 font-black text-center">
-    高高老師語你在一起
-  </div>
-
-  <img
-    src="/icons/logo.png"
-    alt="logo"
-    className="w-[65px] opacity-90 pointer-events-none"
-  />
-</div>
-
-          
-          <button onClick={() => changeBoard('prev')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 mt-auto hover:bg-indigo-100 transition-colors">
-<span className="text-[36px] font-black text-center">
-  &lt;&lt;
-</span>
-          </button>
-        </aside>
-
-        {/* Main 3x3 Grid */}
-<main className="flex-grow p-4 grid gap-4 grid-cols-3 grid-rows-3">
-          {visibleTiles.map(tile => (
-            <div 
-              key={tile.id} 
-              onClick={() => handleTileClick(tile)} 
-              className={`relative rounded-[2.5rem] shadow-lg border-4 flex flex-col items-center justify-center p-4 transition-all ${mode === 'edit' ? 'bg-amber-50 border-amber-300' : 'bg-white border-white active:scale-95 cursor-pointer hover:shadow-2xl'}`}
-            >
-              {/* 刪除詞彙按鈕 */}
-              {mode === 'edit' && (
-                <button 
-                  onClick={(e) => deleteTile(tile.id, e)}
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 z-50 font-black"
-                >
-                  ✕
-                </button>
-              )}
-{mode === 'edit' && (
-  <div className="absolute bottom-2 right-2 flex gap-1 z-50">
+  {/* Left Sidebar */}
+  <aside className="w-[320px] flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
     <button
-      onClick={(e) => {
-        e.stopPropagation();
-        moveTileByStep(tile.id, -1);
-      }}
-      className="px-2 py-1 text-xs bg-slate-200 rounded hover:bg-slate-300"
+      onClick={() => handleTileClick(YES_TILE)}
+      className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
     >
-      ↑
+      <img
+        src={YES_TILE.imageUrl}
+        className="w-1/2 object-contain mb-2 pointer-events-none"
+      />
+      <span className="font-black text-green-600 text-4xl">是</span>
     </button>
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        moveTileByStep(tile.id, 1);
-      }}
-      className="px-2 py-1 text-xs bg-slate-200 rounded hover:bg-slate-300"
-    >
-      ↓
-    </button>
-  </div>
-)}
 
-<div className={`w-full flex items-center justify-center relative ${isMobile ? "h-[70%]" : "flex-grow min-h-0"}`}>
-                {tile.imageUrl ? (
-<img
-  src={tile.imageUrl}
-className="h-full w-full object-contain pointer-events-none"/>
-                ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    {mode === 'edit' && <span className="text-slate-400 text-xs font-bold">點擊新增圖片</span>}
-                  </div>
-                )}
-                {mode === 'edit' && (
-                  <div className="absolute inset-0 bg-black/5 pointer-events-none flex items-center justify-center rounded-[2.5rem]">
-                    <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black shadow-md opacity-0 group-hover:opacity-100">更換圖片</span>
-                  </div>
-                )}
-              </div>
-              
-              {mode === 'edit' ? (
-                <input 
-                  type="text" 
-                  value={tile.text}
-                  onClick={e => e.stopPropagation()}
-                  onChange={e => handleTextChange(tile.id, e.target.value)}
-                  className="font-black text-indigo-600 text-2xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none focus:bg-white transition-all"
-                />
-              ) : (
-                <span className={`font-black text-black mt-2 ${isMobile ? "text-xl" : "text-3xl"} leading-tight text-center`}>
-  {tile.text}
-</span>
-
-              )}
-            </div>
-          ))}
-          {Array.from({ length: Math.max(0, TILES_PER_PAGE - visibleTiles.length) }).map((_, i) => (
-            <div key={`empty-${i}`} className="rounded-[2.5rem] bg-slate-50/50 border-4 border-dashed border-slate-200"></div>
-          ))}
-        </main>
-
-        {/* Right Sidebar */}
-<aside className="w-[320px] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
-         <button
-  onClick={() => handleTileClick(NO_TILE)}
-  className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
->
-  <img
-    src={NO_TILE.imageUrl}
-    className="w-1/2 object-contain mb-2 pointer-events-none"
-  />
-  <span className="font-black text-red-600 text-4xl">不</span>
-</button>
-
-          
-        <div className="flex-grow flex flex-col gap-2">
-  <button 
-    disabled={currentPage === 0} 
-    onClick={() => setCurrentPage(p => p - 1)} 
-    className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
-  >
-    ↑
-  </button>
-  <button 
-    disabled={currentPage >= totalPages - 1} 
-    onClick={() => setCurrentPage(p => p + 1)} 
-    className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
-  >
-    ↓
-  </button>
-</div>
-
-          <button onClick={() => changeBoard('next')} className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex flex-col items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors">
-<span className="text-[36px] font-black text-center">
-  &gt;&gt;
-</span>
-          </button>
-        </aside>
+    <div className="mt-1 flex flex-col items-center gap-1">
+      <div className="text-[20px] text-slate-400 font-black text-center">
+        高高老師語你在一起
       </div>
+      <img
+        src="/icons/logo.png"
+        alt="logo"
+        className="w-[65px] opacity-90 pointer-events-none"
+      />
+    </div>
+
+    <button
+      onClick={() => changeBoard('prev')}
+      className="h-[12vh] mt-auto bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+    >
+      <span className="text-[36px] font-black">&lt;&lt;</span>
+    </button>
+  </aside>
+
+  {/* Main Grid */}
+  <main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4">
+    {visibleTiles.map(tile => (
+      <div
+        key={tile.id}
+        onClick={() => handleTileClick(tile)}
+        className={`relative rounded-[2.5rem] shadow-lg border-4 flex flex-col items-center justify-center p-4 transition-all ${
+          mode === 'edit'
+            ? 'bg-amber-50 border-amber-300'
+            : 'bg-white border-white active:scale-95 cursor-pointer hover:shadow-2xl'
+        }`}
+      >
+        {mode === 'edit' && (
+          <button
+            onClick={(e) => deleteTile(tile.id, e)}
+            className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg z-50 font-black"
+          >
+            ✕
+          </button>
+        )}
+
+        <div className="w-full h-full flex items-center justify-center">
+          {tile.imageUrl ? (
+            <img
+              src={tile.imageUrl}
+              className="w-full h-full object-contain pointer-events-none"
+            />
+          ) : (
+            <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+          )}
+        </div>
+
+        {mode === 'edit' ? (
+          <input
+            type="text"
+            value={tile.text}
+            onClick={e => e.stopPropagation()}
+            onChange={e => handleTextChange(tile.id, e.target.value)}
+            className="font-black text-indigo-600 text-2xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
+          />
+        ) : (
+          <span className="font-black text-3xl mt-2 text-center">
+            {tile.text}
+          </span>
+        )}
+      </div>
+    ))}
+  </main>
+
+  {/* Right Sidebar */}
+  <aside className="w-[320px] flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
+    <button
+      onClick={() => handleTileClick(NO_TILE)}
+      className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
+    >
+      <img
+        src={NO_TILE.imageUrl}
+        className="w-1/2 object-contain mb-2 pointer-events-none"
+      />
+      <span className="font-black text-red-600 text-4xl">不</span>
+    </button>
+
+    <div className="flex-grow flex flex-col gap-2">
+      <button
+        disabled={currentPage === 0}
+        onClick={() => setCurrentPage(p => p - 1)}
+        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg font-bold text-3xl"
+      >
+        ↑
+      </button>
+      <button
+        disabled={currentPage >= totalPages - 1}
+        onClick={() => setCurrentPage(p => p + 1)}
+        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg font-bold text-3xl"
+      >
+        ↓
+      </button>
+    </div>
+
+    <button
+      onClick={() => changeBoard('next')}
+      className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+    >
+      <span className="text-[36px] font-black">&gt;&gt;</span>
+    </button>
+  </aside>
+</div>
 
       {/* Footer Area */}
       <footer className="h-[10vh] bg-white border-t border-slate-100 flex items-center justify-between px-12 z-40">
