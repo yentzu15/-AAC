@@ -360,6 +360,9 @@ const moveTile = (fromId: string, toId: string) => {
       reader.readAsDataURL(file);
     }
   };
+// ===== Layout tuning (Desktop + Tablet) =====
+const SIDEBAR_W = 240; // 左右側欄寬度(px) 先用 240
+const BTN_H_VH = 18;   // YES/NO 高度(vh) 先用 18
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-white select-none relative">
@@ -419,11 +422,16 @@ const moveTile = (fromId: string, toId: string) => {
   {/* Grid Area */}
 <div className="flex-grow flex bg-slate-100 overflow-hidden">
   {/* Left Sidebar */}
-  <aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
+<aside
+  className="flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50"
+  style={{ width: SIDEBAR_W }}
+>
     <button
-      onClick={() => handleTileClick(YES_TILE)}
-      className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
-    >
+  onClick={() => handleTileClick(YES_TILE)}
+  className="w-full bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
+  style={{ height: `${BTN_H_VH}vh` }}
+>
+
       <img
         src={YES_TILE.imageUrl}
         className="w-1/2 object-contain mb-2 pointer-events-none"
@@ -509,17 +517,22 @@ const moveTile = (fromId: string, toId: string) => {
   </main>
 
   {/* Right Sidebar */}
-  <aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
+<aside
+  className="flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50"
+  style={{ width: SIDEBAR_W }}
+>
     <button
-      onClick={() => handleTileClick(NO_TILE)}
-      className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
-    >
-      <img
-        src={NO_TILE.imageUrl}
-        className="w-1/2 object-contain mb-2 pointer-events-none"
-      />
-      <span className="font-black text-red-600 text-3xl">不</span>
-    </button>
+  onClick={() => handleTileClick(NO_TILE)}
+  className="w-full bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
+  style={{ height: `${BTN_H_VH}vh` }}
+>
+  <img
+    src={NO_TILE.imageUrl}
+    className="w-1/2 object-contain mb-2 pointer-events-none"
+  />
+  <span className="font-black text-red-600 text-3xl">不</span>
+</button>
+
 
     <div className="flex-grow flex flex-col gap-2">
       <button
