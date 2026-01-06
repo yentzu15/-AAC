@@ -416,38 +416,38 @@ const moveTile = (fromId: string, toId: string) => {
         </div>
       </div>
 
-    {/* Grid Area */}
+   {/* Grid Area */}
 <div className="flex-grow flex bg-slate-100 overflow-hidden">
 
   {/* Left Sidebar */}
-<aside className="w-[240px] xl:w-[300px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
+  <aside className="w-[220px] lg:w-[240px] xl:w-[280px] flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
     <button
       onClick={() => handleTileClick(YES_TILE)}
-      className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
+      className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
     >
       <img
         src={YES_TILE.imageUrl}
         className="w-1/2 object-contain mb-2 pointer-events-none"
       />
-      <span className="font-black text-green-600 text-4xl">是</span>
+      <span className="font-black text-green-600 text-3xl">是</span>
     </button>
 
     <div className="mt-1 flex flex-col items-center gap-1">
-      <div className="text-[20px] text-slate-400 font-black text-center">
+      <div className="text-[18px] text-slate-400 font-black text-center">
         高高老師語你在一起
       </div>
       <img
         src="/icons/logo.png"
         alt="logo"
-        className="w-[65px] opacity-90 pointer-events-none"
+        className="w-[58px] opacity-90 pointer-events-none"
       />
     </div>
 
     <button
       onClick={() => changeBoard('prev')}
-      className="h-[12vh] mt-auto bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+      className="h-[11vh] mt-auto bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
     >
-      <span className="text-[36px] font-black">&lt;&lt;</span>
+      <span className="text-[32px] font-black">&lt;&lt;</span>
     </button>
   </aside>
 
@@ -491,42 +491,49 @@ const moveTile = (fromId: string, toId: string) => {
             value={tile.text}
             onClick={e => e.stopPropagation()}
             onChange={e => handleTextChange(tile.id, e.target.value)}
-            className="font-black text-indigo-600 text-2xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
+            className="font-black text-indigo-600 text-xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
           />
         ) : (
-          <span className="font-black text-3xl mt-2 text-center">
+          <span className="font-black text-2xl mt-2 text-center">
             {tile.text}
           </span>
         )}
       </div>
     ))}
+
+    {Array.from({ length: Math.max(0, TILES_PER_PAGE - visibleTiles.length) }).map((_, i) => (
+      <div
+        key={`empty-${i}`}
+        className="rounded-[2.5rem] bg-slate-50/50 border-4 border-dashed border-slate-200"
+      />
+    ))}
   </main>
 
   {/* Right Sidebar */}
-<aside className="w-[240px] xl:w-[300px] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
-
+  <aside className="w-[220px] lg:w-[240px] xl:w-[280px] flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
+    <button
       onClick={() => handleTileClick(NO_TILE)}
-      className="w-full h-[25vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
+      className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
     >
       <img
         src={NO_TILE.imageUrl}
         className="w-1/2 object-contain mb-2 pointer-events-none"
       />
-      <span className="font-black text-red-600 text-4xl">不</span>
+      <span className="font-black text-red-600 text-3xl">不</span>
     </button>
 
     <div className="flex-grow flex flex-col gap-2">
       <button
         disabled={currentPage === 0}
         onClick={() => setCurrentPage(p => p - 1)}
-        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg font-bold text-3xl"
+        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
       >
         ↑
       </button>
       <button
         disabled={currentPage >= totalPages - 1}
         onClick={() => setCurrentPage(p => p + 1)}
-        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg font-bold text-3xl"
+        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
       >
         ↓
       </button>
@@ -534,11 +541,12 @@ const moveTile = (fromId: string, toId: string) => {
 
     <button
       onClick={() => changeBoard('next')}
-      className="h-[12vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+      className="h-[11vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
     >
-      <span className="text-[36px] font-black">&gt;&gt;</span>
+      <span className="text-[32px] font-black">&gt;&gt;</span>
     </button>
   </aside>
+
 </div>
 
       {/* Footer Area */}
