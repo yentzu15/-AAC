@@ -416,11 +416,10 @@ const moveTile = (fromId: string, toId: string) => {
         </div>
       </div>
 
-   {/* Grid Area */}
+  {/* Grid Area */}
 <div className="flex-grow flex bg-slate-100 overflow-hidden">
-
   {/* Left Sidebar */}
-<aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
+  <aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50">
     <button
       onClick={() => handleTileClick(YES_TILE)}
       className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
@@ -452,7 +451,7 @@ const moveTile = (fromId: string, toId: string) => {
   </aside>
 
   {/* Main Grid */}
-  <main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4">
+  <main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4 min-w-0">
     {visibleTiles.map(tile => (
       <div
         key={tile.id}
@@ -472,7 +471,7 @@ const moveTile = (fromId: string, toId: string) => {
           </button>
         )}
 
-        <div className="w-full h-full flex items-center justify-center">
+        <div className="w-full flex-1 min-h-0 flex items-center justify-center">
           {tile.imageUrl ? (
             <img
               src={tile.imageUrl}
@@ -510,7 +509,7 @@ const moveTile = (fromId: string, toId: string) => {
   </main>
 
   {/* Right Sidebar */}
-<aside className=<aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
+  <aside className="w-[300px] flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50">
     <button
       onClick={() => handleTileClick(NO_TILE)}
       className="w-full h-[22vh] bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
@@ -546,8 +545,8 @@ const moveTile = (fromId: string, toId: string) => {
       <span className="text-[32px] font-black">&gt;&gt;</span>
     </button>
   </aside>
-
 </div>
+
 
       {/* Footer Area */}
       <footer className="h-[10vh] bg-white border-t border-slate-100 flex items-center justify-between px-12 z-40">
