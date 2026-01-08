@@ -124,8 +124,23 @@ const loadUI = (): UIState => {
   }
 };
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+
+  return isMobile;
+};
+
 const App: React.FC = () => {
-  
+  const isMobile = useIsMobile();
+
   const [boards, setBoards] = useState<AACBoard[]>(() => {
   try {
     const saved = localStorage.getItem(BOARDS_KEY);
@@ -148,6 +163,7 @@ const [sentence, setSentence] = useState<AACTile[]>([]);
 const [keyboardText, setKeyboardText] = useState<string>(ui.keyboardText ?? '');
 const [editingTileId, setEditingTileId] = useState<string | null>(null);
 const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
+const [dragOverTileId, setDragOverTileId] = useState<string | null>(null);
 
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -361,8 +377,8 @@ const moveTile = (fromId: string, toId: string) => {
     }
   };
 // ===== Layout tuning (Desktop + Tablet) =====
-const SIDEBAR_W = 240; // 左右側欄寬度(px) 先用 240
-const BTN_H_VH = 18;   // YES/NO 高度(vh) 先用 18
+const SIDEBAR_W = 150; // 左右側欄寬度(px) 先用 150
+const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-white select-none relative">
@@ -393,172 +409,346 @@ const BTN_H_VH = 18;   // YES/NO 高度(vh) 先用 18
         </label>
       </nav>
 
-      {/* Sentence Bar */}
-      <div className="h-[12vh] bg-slate-50 border-b border-slate-200 flex items-center gap-4 px-6 overflow-hidden flex-shrink-0 shadow-inner z-30">
-        <div className="flex-grow flex items-center gap-2 overflow-x-auto no-scrollbar h-full py-2">
-          {sentence.length === 0 && !keyboardText && <span className="text-slate-400 font-bold italic text-xl">點選按鈕開始對話...</span>}
-          {sentence.map((t, i) => (
-            <div key={i} onClick={() => setSentence(prev => prev.filter((_, idx) => idx !== i))} className="flex-shrink-0 flex flex-col items-center bg-white border-2 border-slate-200 rounded-2xl p-1 shadow-sm h-full aspect-square justify-center cursor-pointer hover:border-red-300 transition-colors">
-              {t.imageUrl && <img src={t.imageUrl} className="h-3/5 object-contain pointer-events-none" />}
-              <span className="text-[12px] font-black text-slate-800 truncate w-full text-center">{t.text}</span>
-            </div>
-          ))}
+     {/* Sentence Bar */}
+{isMobile ? (
+  // ===== Mobile Sentence Bar (two rows) =====
+  <div className="bg-slate-50 border-b border-slate-200 px-3 py-2 flex flex-col gap-2 flex-shrink-0 shadow-inner z-30">
+    
+    {/* Row 1：句條 */}
+    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {sentence.length === 0 && !keyboardText && (
+        <span className="text-slate-400 font-bold italic text-sm">
+          點選按鈕開始對話…
+        </span>
+      )}
+      {sentence.map((t, i) => (
+        <div
+          key={i}
+          onClick={() => setSentence(prev => prev.filter((_, idx) => idx !== i))}
+          className="flex-shrink-0 flex flex-col items-center bg-white border border-slate-200 rounded-xl px-2 py-1 shadow-sm cursor-pointer"
+        >
+          {t.imageUrl && (
+            <img src={t.imageUrl} className="h-8 object-contain pointer-events-none" />
+          )}
+          <span className="text-[10px] font-black text-slate-800">
+            {t.text}
+          </span>
         </div>
-        <div className="flex gap-2 h-3/4 items-center">
-          <input 
-            type="text" 
-            value={keyboardText} 
-            onChange={(e) => setKeyboardText(e.target.value)} 
-            onKeyDown={(e) => e.key === 'Enter' && handleFullSpeak()}
-            placeholder="打字區..." 
-            className="bg-white border-2 border-slate-200 rounded-xl px-4 py-2 font-bold w-48 focus:border-indigo-300 outline-none transition-all shadow-sm" 
-          />
-          <button onClick={() => setSentence(prev => prev.slice(0, -1))} className="px-5 bg-amber-100 text-amber-700 rounded-2xl font-black h-full active:bg-amber-200 hover:bg-amber-200 transition-colors">退格</button>
-          <button onClick={() => {setSentence([]); setKeyboardText('');}} className="px-5 bg-slate-200 text-slate-600 rounded-2xl font-black h-full active:bg-slate-300 hover:bg-slate-300 transition-colors">清除</button>
-          <button onClick={handleFullSpeak} className="px-12 bg-indigo-600 text-white rounded-2xl font-black text-2xl h-full shadow-lg active:scale-95 hover:bg-indigo-700 transition-all">發聲</button>
-        </div>
-      </div>
-
-  {/* Grid Area */}
-<div className="flex-grow flex bg-slate-100 overflow-hidden">
-  {/* Left Sidebar */}
-<aside
-  className="flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50"
-  style={{ width: SIDEBAR_W }}
->
-    <button
-  onClick={() => handleTileClick(YES_TILE)}
-  className="w-full bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all"
-  style={{ height: `${BTN_H_VH}vh` }}
->
-
-      <img
-        src={YES_TILE.imageUrl}
-        className="w-1/2 object-contain mb-2 pointer-events-none"
-      />
-      <span className="font-black text-green-600 text-3xl">是</span>
-    </button>
-
-    <div className="mt-1 flex flex-col items-center gap-1">
-      <div className="text-[18px] text-slate-400 font-black text-center">
-        高高老師語你在一起
-      </div>
-      <img
-        src="/icons/logo.png"
-        alt="logo"
-        className="w-[58px] opacity-90 pointer-events-none"
-      />
+      ))}
     </div>
 
-    <button
-      onClick={() => changeBoard('prev')}
-      className="h-[11vh] mt-auto bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
-    >
-      <span className="text-[32px] font-black">&lt;&lt;</span>
-    </button>
-  </aside>
-
-  {/* Main Grid */}
-  <main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4 min-w-0">
-    {visibleTiles.map(tile => (
-      <div
-        key={tile.id}
-        onClick={() => handleTileClick(tile)}
-        className={`relative rounded-[2.5rem] shadow-lg border-4 flex flex-col items-center justify-center p-4 transition-all ${
-          mode === 'edit'
-            ? 'bg-amber-50 border-amber-300'
-            : 'bg-white border-white active:scale-95 cursor-pointer hover:shadow-2xl'
-        }`}
+    {/* Row 2：打字＋按鈕 */}
+    <div className="flex items-center gap-2">
+      <input
+        type="text"
+        value={keyboardText}
+        onChange={(e) => setKeyboardText(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleFullSpeak()}
+        placeholder="打字區…"
+        className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold outline-none"
+      />
+      <button
+        onClick={() => setSentence(prev => prev.slice(0, -1))}
+        className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg font-black text-sm"
       >
-        {mode === 'edit' && (
-          <button
-            onClick={(e) => deleteTile(tile.id, e)}
-            className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg z-50 font-black"
-          >
-            ✕
-          </button>
-        )}
+        退格
+      </button>
+      <button
+        onClick={handleFullSpeak}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-black text-sm"
+      >
+        發聲
+      </button>
+    </div>
+  </div>
+) : (
+  // ===== Desktop / Tablet Sentence Bar（你原本那一整段 그대로放回來）=====
+  <div className="h-[12vh] bg-slate-50 border-b border-slate-200 flex items-center gap-4 px-6 overflow-hidden flex-shrink-0 shadow-inner z-30">
+    {/* ⚠️ 這裡放你原本的桌機版 Sentence Bar 內容，不用改 */}
+  </div>
+)}
 
-        <div className="w-full flex-1 min-h-0 flex items-center justify-center">
-          {tile.imageUrl ? (
-            <img
-              src={tile.imageUrl}
-              className="w-full h-full object-contain pointer-events-none"
+
+ {/* Grid Area */}
+{isMobile ? (
+  // =====================
+  // Mobile Layout
+  // =====================
+  <div className="flex-grow flex flex-col bg-slate-100 overflow-hidden">
+    <main className="flex-1 p-3 grid grid-cols-2 gap-3 overflow-y-auto min-h-0">
+      {activeBoard.tiles.map(tile => (
+        <div
+          key={tile.id}
+          onClick={() => handleTileClick(tile)}
+          className={`relative rounded-[1.75rem] shadow-lg border-4 flex flex-col items-center justify-center p-3 transition-all ${
+            mode === 'edit'
+              ? 'bg-amber-50 border-amber-300'
+              : 'bg-white border-white active:scale-95 cursor-pointer'
+          }`}
+        >
+          {mode === 'edit' && (
+            <button
+              onClick={(e) => deleteTile(tile.id, e)}
+              className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg z-50 font-black"
+            >
+              ✕
+            </button>
+          )}
+{mode === 'edit' && (
+  <div className="absolute top-2 left-2 flex gap-1 z-50">
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        moveTileByStep(tile.id, -1);
+      }}
+      className="px-2 py-1 rounded-md bg-slate-900/80 text-white text-xs font-black"
+    >
+      ◀
+    </button>
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        moveTileByStep(tile.id, 1);
+      }}
+      className="px-2 py-1 rounded-md bg-slate-900/80 text-white text-xs font-black"
+    >
+      ▶
+    </button>
+  </div>
+)}
+
+          <div className="w-full flex-1 min-h-0 flex items-center justify-center">
+            {tile.imageUrl ? (
+              <img src={tile.imageUrl} className="w-full h-full object-contain pointer-events-none" />
+            ) : (
+              <svg className="w-12 h-12 text-slate-200" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+              </svg>
+            )}
+          </div>
+
+          {mode === 'edit' ? (
+            <input
+              type="text"
+              value={tile.text}
+              onClick={e => e.stopPropagation()}
+              onChange={e => handleTextChange(tile.id, e.target.value)}
+              className="font-black text-indigo-600 text-lg mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
             />
           ) : (
-            <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-            </svg>
+            <span className="font-black text-xl mt-2 text-center leading-tight">
+              {tile.text}
+            </span>
           )}
         </div>
+      ))}
+    </main>
 
-        {mode === 'edit' ? (
-          <input
-            type="text"
-            value={tile.text}
-            onClick={e => e.stopPropagation()}
-            onChange={e => handleTextChange(tile.id, e.target.value)}
-            className="font-black text-indigo-600 text-xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
-          />
-        ) : (
-          <span className="font-black text-2xl mt-2 text-center">
-            {tile.text}
-          </span>
-        )}
-      </div>
-    ))}
-
-    {Array.from({ length: Math.max(0, TILES_PER_PAGE - visibleTiles.length) }).map((_, i) => (
-      <div
-        key={`empty-${i}`}
-        className="rounded-[2.5rem] bg-slate-50/50 border-4 border-dashed border-slate-200"
-      />
-    ))}
-  </main>
-
-  {/* Right Sidebar */}
-<aside
-  className="flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50"
-  style={{ width: SIDEBAR_W }}
->
-    <button
-  onClick={() => handleTileClick(NO_TILE)}
-  className="w-full bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all"
-  style={{ height: `${BTN_H_VH}vh` }}
->
-  <img
-    src={NO_TILE.imageUrl}
-    className="w-1/2 object-contain mb-2 pointer-events-none"
-  />
-  <span className="font-black text-red-600 text-3xl">不</span>
-</button>
-
-
-    <div className="flex-grow flex flex-col gap-2">
+    <div className="h-[14vh] bg-white/70 border-t border-slate-200 p-2 flex items-stretch gap-2">
       <button
-        disabled={currentPage === 0}
-        onClick={() => setCurrentPage(p => p - 1)}
-        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+        onClick={() => changeBoard('prev')}
+        className="w-[18%] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95"
       >
-        ↑
+        <span className="text-3xl font-black">&lt;</span>
       </button>
+
       <button
-        disabled={currentPage >= totalPages - 1}
-        onClick={() => setCurrentPage(p => p + 1)}
-        className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+        onClick={() => handleTileClick(YES_TILE)}
+        className="flex-1 bg-white rounded-2xl shadow-lg border-4 border-green-500 flex items-center justify-center gap-2 active:scale-95"
       >
-        ↓
+        <img src={YES_TILE.imageUrl} className="h-[60%] object-contain pointer-events-none" />
+        <span className="font-black text-green-600 text-2xl">是</span>
+      </button>
+
+      <button
+        onClick={() => handleTileClick(NO_TILE)}
+        className="flex-1 bg-white rounded-2xl shadow-lg border-4 border-red-500 flex items-center justify-center gap-2 active:scale-95"
+      >
+        <img src={NO_TILE.imageUrl} className="h-[60%] object-contain pointer-events-none" />
+        <span className="font-black text-red-600 text-2xl">不</span>
+      </button>
+
+      <button
+        onClick={() => changeBoard('next')}
+        className="w-[18%] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95"
+      >
+        <span className="text-3xl font-black">&gt;</span>
       </button>
     </div>
-
-    <button
-      onClick={() => changeBoard('next')}
-      className="h-[11vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+  </div>
+) : (
+  // =====================
+  // Desktop + Tablet Layout (your existing one)
+  // =====================
+  <div className="flex-grow flex bg-slate-100 overflow-hidden">
+    {/* Left Sidebar */}
+    <aside
+      className="flex-shrink-0 flex flex-col gap-4 p-4 border-r border-slate-200 bg-white/50"
+      style={{ width: SIDEBAR_W }}
     >
-      <span className="text-[32px] font-black">&gt;&gt;</span>
-    </button>
-  </aside>
-</div>
+      <button
+        onClick={() => handleTileClick(YES_TILE)}
+        className="w-full overflow-hidden bg-white rounded-[2rem] shadow-xl border-8 border-green-500 flex flex-col items-center justify-center active:scale-95 transition-all
+                   h-[clamp(160px,22vh,280px)]"
+      >
+        <img
+          src={YES_TILE.imageUrl}
+          className="max-h-[56%] max-w-[80%] object-contain mb-2 pointer-events-none"
+        />
+        <span className="font-black text-green-600 text-3xl lg:text-4xl leading-none">是</span>
+      </button>
+
+      <div className="mt-1 flex flex-col items-center gap-1">
+        <div className="text-[14px] md:text-[16px] text-slate-400 font-black text-center whitespace-nowrap leading-none">
+          高高老師語你在一起
+        </div>
+        <img src="/icons/logo.png" alt="logo" className="w-[58px] opacity-90 pointer-events-none" />
+      </div>
+
+      <button
+        onClick={() => changeBoard('prev')}
+        className="h-[11vh] mt-auto bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+      >
+        <span className="text-[32px] font-black">&lt;&lt;</span>
+      </button>
+    </aside>
+
+    {/* Main Grid */}
+<main className="flex-grow p-4 grid grid-cols-3 grid-rows-3 gap-4 min-w-0">
+  {visibleTiles.map(tile => (
+    <div
+      key={tile.id}
+      draggable={mode === 'edit'}
+      onDragStart={() => {
+        setDraggingTileId(tile.id);
+        setDragOverTileId(null);
+      }}
+      onDragEnter={() => {
+        if (mode === 'edit' && draggingTileId && draggingTileId !== tile.id) {
+          setDragOverTileId(tile.id);
+        }
+      }}
+      onDragOver={(e) => {
+        if (mode === 'edit') e.preventDefault(); // 允許 drop
+      }}
+      onDragLeave={(e) => {
+        // 避免在子元素移動就一直閃，只有真的離開才清
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setDragOverTileId((prev) => (prev === tile.id ? null : prev));
+        }
+      }}
+      onDrop={() => {
+        if (mode === 'edit' && draggingTileId && draggingTileId !== tile.id) {
+          moveTile(draggingTileId, tile.id);
+        }
+        setDraggingTileId(null);
+        setDragOverTileId(null);
+      }}
+      onDragEnd={() => {
+        setDraggingTileId(null);
+        setDragOverTileId(null);
+      }}
+      onClick={() => handleTileClick(tile)}
+      className={`relative rounded-[2.5rem] shadow-lg border-4 flex flex-col items-center justify-center p-4 transition-all ${
+        mode === 'edit'
+          ? 'bg-amber-50 border-amber-300 cursor-move'
+          : 'bg-white border-white active:scale-95 cursor-pointer hover:shadow-2xl'
+      } ${
+        mode === 'edit' && dragOverTileId === tile.id
+          ? 'ring-8 ring-indigo-400 border-indigo-400 shadow-2xl'
+          : ''
+      }`}
+    >
+      {mode === 'edit' && (
+        <button
+          onClick={(e) => deleteTile(tile.id, e)}
+          className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg z-50 font-black"
+        >
+          ✕
+        </button>
+      )}
+
+      <div className="w-full flex-1 min-h-0 flex items-center justify-center">
+        {tile.imageUrl ? (
+          <img
+            src={tile.imageUrl}
+            className="w-full h-full object-contain pointer-events-none"
+          />
+        ) : (
+          <svg className="w-16 h-16 text-slate-200" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+          </svg>
+        )}
+      </div>
+
+      {mode === 'edit' ? (
+        <input
+          type="text"
+          value={tile.text}
+          onClick={e => e.stopPropagation()}
+          onChange={e => handleTextChange(tile.id, e.target.value)}
+          className="font-black text-indigo-600 text-xl mt-2 w-full text-center bg-white/50 rounded-lg border-b-2 border-indigo-200 outline-none"
+        />
+      ) : (
+        <span className="font-black text-2xl mt-2 text-center">
+          {tile.text}
+        </span>
+      )}
+    </div>
+  ))}
+
+  {Array.from({ length: Math.max(0, TILES_PER_PAGE - visibleTiles.length) }).map((_, i) => (
+    <div
+      key={`empty-${i}`}
+      className="rounded-[2.5rem] bg-slate-50/50 border-4 border-dashed border-slate-200"
+    />
+  ))}
+</main>
+
+
+    {/* Right Sidebar */}
+    <aside
+      className="flex-shrink-0 flex flex-col gap-4 p-4 border-l border-slate-200 bg-white/50"
+      style={{ width: SIDEBAR_W }}
+    >
+      <button
+        onClick={() => handleTileClick(NO_TILE)}
+        className="w-full overflow-hidden bg-white rounded-[2rem] shadow-xl border-8 border-red-500 flex flex-col items-center justify-center active:scale-95 transition-all
+                   h-[clamp(160px,22vh,280px)]"
+      >
+        <img
+          src={NO_TILE.imageUrl}
+          className="max-h-[56%] max-w-[80%] object-contain mb-2 pointer-events-none"
+        />
+        <span className="font-black text-red-600 text-3xl lg:text-4xl leading-none">不</span>
+      </button>
+
+      <div className="flex-grow flex flex-col gap-2">
+        <button
+          disabled={currentPage === 0}
+          onClick={() => setCurrentPage(p => p - 1)}
+          className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+        >
+          ↑
+        </button>
+        <button
+          disabled={currentPage >= totalPages - 1}
+          onClick={() => setCurrentPage(p => p + 1)}
+          className="flex-1 bg-indigo-600 text-white rounded-2xl flex items-center justify-center disabled:opacity-20 shadow-lg active:scale-95 hover:bg-indigo-700 transition-all font-bold text-3xl"
+        >
+          ↓
+        </button>
+      </div>
+
+      <button
+        onClick={() => changeBoard('next')}
+        className="h-[11vh] bg-indigo-50 text-indigo-700 rounded-2xl border-4 border-indigo-200 flex items-center justify-center active:scale-95 hover:bg-indigo-100 transition-colors"
+      >
+        <span className="text-[32px] font-black">&gt;&gt;</span>
+      </button>
+    </aside>
+  </div>
+)}
 
 
       {/* Footer Area */}
