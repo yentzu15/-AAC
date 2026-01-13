@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AACTile, AACBoard, LayoutMode } from './types';
 import { speakText } from './services/geminiService';
-
+import { get, set } from 'idb-keyval';
 const BOARD_ICONS: Record<string, React.ReactNode> = {
   'board-core': (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
@@ -141,17 +141,24 @@ const useIsMobile = () => {
 const App: React.FC = () => {
   const isMobile = useIsMobile();
 
-  const [boards, setBoards] = useState<AACBoard[]>(() => {
-  try {
-    const saved = localStorage.getItem(BOARDS_KEY);
-    return saved ? JSON.parse(saved) : INITIAL_BOARDS;
-  } catch {
-    return INITIAL_BOARDS;
-  }
-});
+  // 設定初始狀態
+  const [boards, setBoards] = useState<AACBoard[]>(INITIAL_BOARDS);
+  const [isLoaded, setIsLoaded] = useState(false); //用來確認資料拿到沒
+
+  // 1. APP 啟動時，去大倉庫 (IndexedDB) 拿資料
   useEffect(() => {
-  localStorage.setItem(BOARDS_KEY, JSON.stringify(boards));
-}, [boards]);
+    get(BOARDS_KEY).then((val) => {
+      if (val) setBoards(val);
+      setIsLoaded(true);
+    });
+  }, []);
+
+  // 2. 當資料有變動，存回大倉庫
+  useEffect(() => {
+    if (isLoaded) {
+      set(BOARDS_KEY, boards).catch(err => console.error('儲存失敗', err));
+    }
+  }, [boards, isLoaded]);
 
 const ui = loadUI();
 
