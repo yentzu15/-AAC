@@ -349,7 +349,7 @@ const moveTile = (fromId: string, toId: string) => {
         img.src = reader.result as string;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 120; 
+          const MAX_SIZE = 300; 
           let width = img.width;
           let height = img.height;
           if (width > height) {
@@ -362,7 +362,7 @@ const moveTile = (fromId: string, toId: string) => {
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
             setBoards(prev => prev.map(b => ({
               ...b,
               tiles: b.tiles.map(t => t.id === editingTileId ? { ...t, imageUrl: compressedBase64 } : t)
