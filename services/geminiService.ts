@@ -10,7 +10,7 @@ export const speakText = (text: string) => {
   if (!text) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-TW';
-  utterance.rate = 1;
+  utterance.rate = 0.5;
   window.speechSynthesis.speak(utterance);
 };
 
