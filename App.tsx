@@ -174,6 +174,16 @@ const [dragOverTileId, setDragOverTileId] = useState<string | null>(null);
 const lastClickTimeRef = useRef<number>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // 🔥 請加入這個新函式：專門用來檢查是不是按太快
+  const checkDebounce = () => {
+    const now = Date.now();
+    // 如果距離上次點擊不到 1 秒 (1000毫秒)，就回傳 false (擋住)
+    if (now - lastClickTimeRef.current < 1000) { 
+      return false; 
+    }
+    lastClickTimeRef.current = now; // 更新時間
+    return true; // 通過檢查
+  };
 
   const activeBoard = useMemo(() => boards.find(b => b.id === activeBoardId) || boards[0], [boards, activeBoardId]);
   const activeBoardIndex = useMemo(() => boards.findIndex(b => b.id === activeBoardId), [boards, activeBoardId]);
@@ -195,14 +205,11 @@ const lastClickTimeRef = useRef<number>(0);
 }, [activeBoardId, currentPage, mode, keyboardText]);
 
 
-  const handleTileClick = (tile: AACTile) => {
-    // 🔥 加入這段防手抖邏輯 (Debounce)
-    const now = Date.now();
-    if (now - lastClickTimeRef.current < 1000) { // 1000 毫秒 = 1 秒
-      return; // 如果距離上次點擊不到 1 秒，直接忽略，不執行動作
-    }
-    lastClickTimeRef.current = now; // 更新點擊時間
-    
+ const handleTileClick = (tile: AACTile) => {
+    // 🔥 1. 先問守門員：是不是按太快？(如果是，就直接結束，不執行後面的動作)
+    if (!checkDebounce()) return;
+
+    // 2. 如果通過檢查，才執行原本的動作
     if (mode === 'standard') {
       setSentence(prev => [...prev, tile]);
       speakText(tile.text);
@@ -267,26 +274,25 @@ const moveTile = (fromId: string, toId: string) => {
 
 
 const handleFullSpeak = () => {
-    // 1. 先把所有詞彙的文字拿出來，檢查裡面有沒有「問句關鍵字」
+    // 🔥 1. 先問守門員：是不是按太快？
+    if (!checkDebounce()) return;
+
+    // 2. 如果通過檢查，才開始分析語調和發音
     const rawText = sentence.map(t => t.text).join('');
     
-    // 定義問句關鍵字：如果有這些字，通常是在問問題
+    // 判斷語氣
     const isQuestion = ['嗎', '呢', '什麼', '哪裡', '幾', '誰', '怎麼', '好不好'].some(keyword => rawText.includes(keyword));
-    
-    // 定義感嘆關鍵字：如果有這些字，通常語氣比較強烈
     const isExclamation = ['不', '痛', '生氣', '開心', '棒', '救命'].some(keyword => rawText.includes(keyword));
 
-    // 2. 決定最後面的標點符號
-    let endPunctuation = '。'; // 預設是用句號（平平的語調）
+    // 決定標點符號
+    let endPunctuation = '。';
     if (isQuestion) {
-      endPunctuation = '？'; // 變成問號（語調上揚 ⤴️）
+      endPunctuation = '？';
     } else if (isExclamation) {
-      endPunctuation = '！'; // 變成驚嘆號（語氣加重 😤）
+      endPunctuation = '！';
     }
 
-    // 3. 組合句子：
-    //    - 每個詞彙中間加「全形逗號 ，」讓語速變慢、有頓點
-    //    - 最後加上我們判斷好的「標點符號」來改變語調
+    // 組合句子 (中間加逗號變慢，後面加標點變語調)
     const sentenceText = sentence.map(t => t.text).join('，') + endPunctuation;
     
     const fullText = sentenceText + keyboardText;
@@ -472,7 +478,7 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
       ))}
     </div>
 
-    {/* Row 2：打字＋按鈕 */}
+    {/* Row 2：打字＋按鈕 (手機版) */}
     <div className="flex items-center gap-2">
       <input
         type="text"
@@ -482,16 +488,34 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         placeholder="打字區…"
         className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold outline-none"
       />
+      
+      {/* 手機版退格鍵：加上圖示 + 防誤觸 */}
       <button
-        onClick={() => setSentence(prev => prev.slice(0, -1))}
-        className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg font-black text-sm"
+        onClick={() => {
+          if (checkDebounce()) {
+            setSentence(prev => prev.slice(0, -1));
+          }
+        }}
+        className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg font-black text-sm flex items-center gap-1 active:scale-95 transition-all"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H10.29z" opacity="0" />
+          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+          <line x1="18" y1="9" x2="12" y2="15"></line>
+          <line x1="12" y1="9" x2="18" y2="15"></line>
+        </svg>
         退格
       </button>
+
+      {/* 手機版發聲鍵：加上圖示 (原本的 handleFullSpeak 已經有防誤觸了) */}
       <button
         onClick={handleFullSpeak}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-black text-sm"
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-black text-sm flex items-center gap-1 active:scale-95 transition-all shadow-md"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
         發聲
       </button>
     </div>
