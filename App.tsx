@@ -497,9 +497,69 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
     </div>
   </div>
 ) : (
-  // ===== Desktop / Tablet Sentence Bar（你原本那一整段 그대로放回來）=====
+  // ===== Desktop / Tablet Sentence Bar =====
   <div className="h-[12vh] bg-slate-50 border-b border-slate-200 flex items-center gap-4 px-6 overflow-hidden flex-shrink-0 shadow-inner z-30">
-    {/* ⚠️ 這裡放你原本的桌機版 Sentence Bar 內容，不用改 */}
+    {/* 左邊：顯示選取的詞彙卡片 */}
+    <div className="flex-1 flex items-center gap-2 overflow-x-auto no-scrollbar h-full py-2">
+      {sentence.length === 0 && !keyboardText && (
+        <span className="text-slate-400 font-bold italic text-xl ml-4">
+          點選按鈕開始對話…
+        </span>
+      )}
+      {sentence.map((t, i) => (
+        <div
+          key={i}
+          onClick={() => setSentence(prev => prev.filter((_, idx) => idx !== i))}
+          className="flex-shrink-0 h-full flex flex-col items-center justify-center bg-white border-2 border-slate-200 rounded-xl px-3 min-w-[80px] shadow-sm cursor-pointer hover:bg-red-50 hover:border-red-200 transition-colors"
+        >
+          {t.imageUrl && (
+            <img src={t.imageUrl} className="h-[60%] object-contain pointer-events-none" />
+          )}
+          <span className="text-sm font-black text-slate-800 mt-1">
+            {t.text}
+          </span>
+        </div>
+      ))}
+    </div>
+
+    {/* 右邊：操作區 (打字、退格、發聲) */}
+    <div className="flex items-center gap-3 h-[70%] border-l-2 border-slate-200 pl-4">
+      <input
+        type="text"
+        value={keyboardText}
+        onChange={(e) => setKeyboardText(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleFullSpeak()}
+        placeholder="打字…"
+        className="w-48 h-full bg-white border-2 border-slate-200 rounded-xl px-4 text-lg font-bold outline-none focus:border-indigo-400 transition-colors"
+      />
+     <button
+        onClick={() => setSentence(prev => prev.slice(0, -1))}
+        className="h-full px-6 bg-amber-100 text-amber-700 rounded-xl font-black text-lg hover:bg-amber-200 active:scale-95 transition-all flex items-center gap-2"
+      >
+        {/* 退格圖示 */}
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+           {/* 修正：換成更像退格鍵的圖示 */}
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H10.29z" opacity="0" />
+          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+          <line x1="18" y1="9" x2="12" y2="15"></line>
+          <line x1="12" y1="9" x2="18" y2="15"></line>
+        </svg>
+        修正
+      </button>
+      <button
+        onClick={handleFullSpeak}
+        className="h-full px-8 bg-indigo-600 text-white rounded-xl font-black text-xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2"
+      >
+        {/* 發聲圖示 (喇叭) */}
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+           <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+        發聲
+      </button>
+    </div>
   </div>
 )}
 
