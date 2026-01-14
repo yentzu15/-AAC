@@ -171,7 +171,7 @@ const [keyboardText, setKeyboardText] = useState<string>(ui.keyboardText ?? '');
 const [editingTileId, setEditingTileId] = useState<string | null>(null);
 const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
 const [dragOverTileId, setDragOverTileId] = useState<string | null>(null);
-
+const lastClickTimeRef = useRef<number>(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -196,6 +196,13 @@ const [dragOverTileId, setDragOverTileId] = useState<string | null>(null);
 
 
   const handleTileClick = (tile: AACTile) => {
+    // 🔥 加入這段防手抖邏輯 (Debounce)
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 1000) { // 1000 毫秒 = 1 秒
+      return; // 如果距離上次點擊不到 1 秒，直接忽略，不執行動作
+    }
+    lastClickTimeRef.current = now; // 更新點擊時間
+    
     if (mode === 'standard') {
       setSentence(prev => [...prev, tile]);
       speakText(tile.text);
@@ -259,12 +266,33 @@ const moveTile = (fromId: string, toId: string) => {
 };
 
 
-  const handleFullSpeak = () => {
-    const sentenceText = sentence.map(t => t.text).join('');
+const handleFullSpeak = () => {
+    // 1. 先把所有詞彙的文字拿出來，檢查裡面有沒有「問句關鍵字」
+    const rawText = sentence.map(t => t.text).join('');
+    
+    // 定義問句關鍵字：如果有這些字，通常是在問問題
+    const isQuestion = ['嗎', '呢', '什麼', '哪裡', '幾', '誰', '怎麼', '好不好'].some(keyword => rawText.includes(keyword));
+    
+    // 定義感嘆關鍵字：如果有這些字，通常語氣比較強烈
+    const isExclamation = ['不', '痛', '生氣', '開心', '棒', '救命'].some(keyword => rawText.includes(keyword));
+
+    // 2. 決定最後面的標點符號
+    let endPunctuation = '。'; // 預設是用句號（平平的語調）
+    if (isQuestion) {
+      endPunctuation = '？'; // 變成問號（語調上揚 ⤴️）
+    } else if (isExclamation) {
+      endPunctuation = '！'; // 變成驚嘆號（語氣加重 😤）
+    }
+
+    // 3. 組合句子：
+    //    - 每個詞彙中間加「全形逗號 ，」讓語速變慢、有頓點
+    //    - 最後加上我們判斷好的「標點符號」來改變語調
+    const sentenceText = sentence.map(t => t.text).join('，') + endPunctuation;
+    
     const fullText = sentenceText + keyboardText;
+    
     if (fullText) speakText(fullText);
   };
-
   const changeBoard = (dir: 'next' | 'prev') => {
     const newIdx = dir === 'next' ? (activeBoardIndex + 1) % boards.length : (activeBoardIndex - 1 + boards.length) % boards.length;
     setActiveBoardId(boards[newIdx].id);
