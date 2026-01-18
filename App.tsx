@@ -40,7 +40,18 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: '13', text: '去', imageUrl: '/icons/去.png' }
     ]
   },
-
+ {
+    id: 'question',
+    name: '疑問詞',
+    tiles: [
+      { id: 'what', text: '什麼', imageUrl: '/icons/什麼.png' }, // 淺藍色
+      { id: 'where', text: '哪裡', imageUrl: '/icons/哪裡.png' },
+      { id: 'who', text: '誰', imageUrl: '/icons/誰.png' },
+      { id: 'when', text: '什麼時候', imageUrl: '/icons/什麼時候.png' },
+      { id: 'why', text: '為什麼', imageUrl: '/icons/為什麼.png' },
+      { id: 'ma', text: '?', imageUrl: '/icons/嗎.png' }
+    ]
+  },
   {
     id: 'board-emotions',
     name: '情緒表達',
@@ -76,7 +87,18 @@ const INITIAL_BOARDS: AACBoard[] = [
       { id: 'f3', text: '餅乾', imageUrl: '/icons/餅乾.png' }
     ]
   },
-
+{
+    id: 'time',
+    name: '時間語詞', // 🔥 新增：時間版面
+    tiles: [
+      { id: 'now', text: '剛剛', imageUrl: '/icons/剛剛.png' },
+      { id: 'wait', text: '等一下', imageUrl: '/icons/等一下.png' },
+      { id: 'morning', text: '早上', imageUrl: '/icons/早上.png' },
+      { id: 'noon', text: '中午', imageUrl: '/icons/中午.png' },
+      { id: 'afternoon', text: '下午' , imageUrl: '/icons/下午.png'},
+      { id: 'night', text: '晚上' , imageUrl: '/icons/晚上.png'}
+    ]
+  },
   {
     id: 'board-places',
     name: '地點',
