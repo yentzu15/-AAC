@@ -113,7 +113,7 @@ const INITIAL_BOARDS: AACBoard[] = [
   }
 ];
 
-const BOARDS_KEY = 'gemini-aac-boards-v1';
+const BOARDS_KEY = 'gemini-aac-boards-v3';
 const UI_KEY = 'gemini-aac-ui-v2';
 const UI_VERSION = 2;
 
