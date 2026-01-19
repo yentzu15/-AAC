@@ -296,27 +296,32 @@ const moveTile = (fromId: string, toId: string) => {
 
 
 const handleFullSpeak = () => {
-    // 🔥 1. 先問守門員：是不是按太快？
+    // 1. 先問守門員：是不是按太快？
     if (!checkDebounce()) return;
 
-    // 2. 如果通過檢查，才開始分析語調和發音
-    const rawText = sentence.map(t => t.text).join('');
-    
-    // 判斷語氣
-    const isQuestion = ['嗎', '呢', '什麼', '哪裡', '幾', '誰', '怎麼', '好不好'].some(keyword => rawText.includes(keyword));
-    const isExclamation = ['不', '痛', '生氣', '開心', '棒', '救命'].some(keyword => rawText.includes(keyword));
+    let sentenceText = ''; // 🔥 預設是空字串 (解決「先唸句號」的問題)
 
-    // 決定標點符號
-    let endPunctuation = '。';
-    if (isQuestion) {
-      endPunctuation = '？';
-    } else if (isExclamation) {
-      endPunctuation = '！';
+    // 🔥 只有當「有選圖卡」的時候，才去計算語氣和加標點
+    if (sentence.length > 0) {
+      const rawText = sentence.map(t => t.text).join('');
+      
+      // 判斷語氣
+      const isQuestion = ['嗎', '呢', '什麼', '哪裡', '幾', '誰', '怎麼', '好不好'].some(keyword => rawText.includes(keyword));
+      const isExclamation = ['不', '痛', '生氣', '開心', '棒', '救命'].some(keyword => rawText.includes(keyword));
+
+      // 決定標點符號
+      let endPunctuation = '。';
+      if (isQuestion) {
+        endPunctuation = '？';
+      } else if (isExclamation) {
+        endPunctuation = '！';
+      }
+
+      // 組合句子 (中間加逗號變慢，後面加標點變語調)
+      sentenceText = sentence.map(t => t.text).join('，') + endPunctuation;
     }
 
-    // 組合句子 (中間加逗號變慢，後面加標點變語調)
-    const sentenceText = sentence.map(t => t.text).join('，') + endPunctuation;
-    
+    // 3. 組合：圖卡文字 + 打字文字
     const fullText = sentenceText + keyboardText;
     
     if (fullText) speakText(fullText);
