@@ -159,7 +159,42 @@ const useIsMobile = () => {
 
   return isMobile;
 };
+// 🔥 智慧合併小幫手：保留使用者的照片，但更新版面結構
+const smartMerge = (savedBoards: AACBoard[], defaultBoards: AACBoard[]): AACBoard[] => {
+  return defaultBoards.map(defBoard => {
+    // 1. 在舊資料裡找找看有沒有這個版面 (例如 'board-core')
+    const savedBoard = savedBoards.find(b => b.id === defBoard.id);
+    
+    // 如果舊資料沒這個版面，代表這是你新寫的 (例如 'time')，直接用新的
+    if (!savedBoard) return defBoard;
 
+    // 2. 如果有找到，就進去比對每一張卡片
+    const mergedTiles = defBoard.tiles.map(defTile => {
+      const savedTile = savedBoard.tiles.find(t => t.id === defTile.id);
+      
+      if (savedTile) {
+        // 🔥 重點：如果有找到舊卡片，就保留使用者的「照片」和「文字」
+        // 其他設定 (如背景色、連結) 則使用你新寫的程式碼
+        return {
+          ...defTile, // 先拿新設定 (包含新背景色)
+          text: savedTile.text, // 保留使用者改過的文字
+          imageUrl: savedTile.imageUrl || defTile.imageUrl // 優先用使用者的照片
+        };
+      }
+      // 如果舊資料沒這張卡 (代表這是你新加的按鈕)，就用新的
+      return defTile;
+    });
+
+    // 3. (進階) 如果使用者自己在 UI 上新增了「自訂詞彙」，也要記得加回來
+    // 找出那些 ID 不在預設版面裡的卡片 (通常是 custom-tile-...)
+    const customUserTiles = savedBoard.tiles.filter(t => !defBoard.tiles.find(dt => dt.id === t.id));
+
+    return {
+      ...defBoard,
+      tiles: [...mergedTiles, ...customUserTiles] // 合併：更新後的預設卡片 + 使用者自訂卡片
+    };
+  });
+};
 const App: React.FC = () => {
   const isMobile = useIsMobile();
 
@@ -167,10 +202,18 @@ const App: React.FC = () => {
   const [boards, setBoards] = useState<AACBoard[]>(INITIAL_BOARDS);
   const [isLoaded, setIsLoaded] = useState(false); //用來確認資料拿到沒
 
-  // 1. APP 啟動時，去大倉庫 (IndexedDB) 拿資料
+ // 1. APP 啟動時，執行智慧合併 (保留照片 + 更新版面)
   useEffect(() => {
-    get(BOARDS_KEY).then((val) => {
-      if (val) setBoards(val);
+    get(BOARDS_KEY).then((savedData) => {
+      if (savedData) {
+        console.log('發現舊資料，正在執行智慧合併...');
+        // 如果上面有加 smartMerge 函式，這裡就會生效
+        const merged = smartMerge(savedData, INITIAL_BOARDS);
+        setBoards(merged);
+      } else {
+        // 沒資料就直接用新的
+        setBoards(INITIAL_BOARDS);
+      }
       setIsLoaded(true);
     });
   }, []);
