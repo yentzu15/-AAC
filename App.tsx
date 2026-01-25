@@ -250,10 +250,13 @@ const [currentPage, setCurrentPage] = useState<number>(ui.currentPage ?? 0);
 const [mode, setMode] = useState<LayoutMode>(ui.mode ?? 'standard');
 const [sentence, setSentence] = useState<AACTile[]>([]);
 const [keyboardText, setKeyboardText] = useState<string>(ui.keyboardText ?? '');
+  const [showCopyright, setShowCopyright] = useState(false);
 const [editingTileId, setEditingTileId] = useState<string | null>(null);
 const [draggingTileId, setDraggingTileId] = useState<string | null>(null);
 const [dragOverTileId, setDragOverTileId] = useState<string | null>(null);
 const lastClickTimeRef = useRef<number>(0);
+const [showEditWarning, setShowEditWarning] = useState(false);
+const [editWarningChecked, setEditWarningChecked] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   // 🔥 請加入這個新函式：專門用來檢查是不是按太快
@@ -300,6 +303,7 @@ const lastClickTimeRef = useRef<number>(0);
       fileInputRef.current?.click();
     }
   };
+
 
   const handleTextChange = (id: string, newText: string) => {
     setBoards(prev => prev.map(b => ({
@@ -530,7 +534,20 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         </div>
         <label className="flex items-center gap-2 cursor-pointer bg-slate-100 px-3 py-2 rounded-xl border border-slate-200 shrink-0">
           <span className="text-xs font-black text-slate-500">編輯模式</span>
-          <input type="checkbox" className="sr-only" checked={mode === 'edit'} onChange={() => setMode(m => m === 'standard' ? 'edit' : 'standard')} />
+          <input
+  type="checkbox"
+  className="sr-only"
+  checked={mode === 'edit'}
+  onChange={() => {
+    if (mode === 'standard') {
+      setEditWarningChecked(false);
+      setShowEditWarning(true); // 只彈警語
+    } else {
+      setMode('standard'); // 從 edit 關掉時直接回 standard
+    }
+  }}
+/>
+
           <div className={`w-10 h-6 rounded-full relative transition-colors ${mode === 'edit' ? 'bg-amber-500' : 'bg-slate-300'}`}>
             <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${mode === 'edit' ? 'translate-x-4' : ''}`}></div>
           </div>
@@ -962,7 +979,15 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         <div className="text-sm font-black text-slate-400">
           目前版面：{activeBoard.name} (頁 {currentPage + 1}/{totalPages})
         </div>
-        
+       {isMobile && (
+  <button
+    onClick={() => setShowCopyright(true)}
+    className="px-3 py-1 text-xs bg-slate-200 rounded-lg font-bold"
+  >
+    ℹ️ 關於
+  </button>
+)}
+ 
         {mode === 'edit' ? (
           <div className="flex gap-2">
             <button onClick={deleteCurrentBoard} className="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors shadow-sm">刪除此版面</button>
@@ -974,10 +999,77 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           </div>
         ) : (
           <div className="text-[10px] font-bold text-slate-300">
-            邱彥慈 語言治療師 製作
+        © 邱彥慈 語言治療師｜ FB/IG 高高老師語你在一起 @gaowithyou
           </div>
         )}
       </footer>
+      {showEditWarning && (
+  <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+    <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
+      <div className="px-6 py-5 bg-rose-50 border-b border-rose-100">
+        <div className="text-xl font-black text-rose-700">使用前注意</div>
+        <div className="text-sm font-bold text-rose-500 mt-1">
+          進入編輯模式前，請先確認備份觀念
+        </div>
+      </div>
+
+      <div className="px-6 py-5 space-y-4 text-slate-700">
+        <div className="space-y-2 text-sm font-bold leading-relaxed">
+          <div>1) 資料僅儲存在本機瀏覽器，不會自動上傳雲端。</div>
+          <div>2) 清除瀏覽器資料／更換裝置／更換瀏覽器，可能導致資料消失。</div>
+          <div>3) 每次大量編輯或更新版本前，請先匯出備份（JSON）。</div>
+        </div>
+
+        <label className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
+          <input
+            type="checkbox"
+            className="mt-1 w-5 h-5"
+            checked={editWarningChecked}
+            onChange={(e) => setEditWarningChecked(e.target.checked)}
+          />
+          <div className="text-sm font-bold text-slate-700 leading-relaxed">
+            我已了解上述風險，並會先匯出備份再編輯。
+          </div>
+        </label>
+
+        <div className="text-[12px] font-bold text-slate-500">
+          聯絡：yentzu1234@gmail.com
+          Facebook：高高老師語你在一起
+          Instagram：@gaowithyou
+        </div>
+      </div>
+
+      <div className="px-6 py-4 flex gap-3 border-t border-slate-100">
+        <button
+          onClick={() => {
+  setShowEditWarning(false);
+  setEditWarningChecked(false);
+  // 不要 setMode，因為你還沒進 edit
+}}
+
+          className="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-700 font-black active:scale-95"
+        >
+          取消
+        </button>
+
+        <button
+          disabled={!editWarningChecked}
+          onClick={() => onClick={() => {
+  setShowEditWarning(false);
+  setMode('edit');
+}}
+(false)}
+          className={`flex-1 py-3 rounded-2xl font-black text-white active:scale-95 ${
+            editWarningChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'
+          }`}
+        >
+          我了解，進入編輯
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
