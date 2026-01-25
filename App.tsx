@@ -113,7 +113,7 @@ const INITIAL_BOARDS: AACBoard[] = [
   }
 ];
 
-const BOARDS_KEY = 'gemini-aac-boards-v1';
+const BOARDS_KEY = 'gemini-aac-boards-v3';
 const UI_KEY = 'gemini-aac-ui-v2';
 const UI_VERSION = 2;
 
@@ -146,7 +146,7 @@ const loadUI = (): UIState => {
   }
 };
 
-const  = () => {
+const useIsMobile = () => {
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -159,6 +159,7 @@ const  = () => {
 
   return isMobile;
 };
+
 // 🔥 智慧合併小幫手：保留使用者的照片，但更新版面結構
 const smartMerge = (savedBoards: AACBoard[], defaultBoards: AACBoard[]): AACBoard[] => {
   return defaultBoards.map(defBoard => {
@@ -196,7 +197,7 @@ const smartMerge = (savedBoards: AACBoard[], defaultBoards: AACBoard[]): AACBoar
   });
 };
 const App: React.FC = () => {
-  const isMobile = ();
+const isMobile = useIsMobile();
 
   // 設定初始狀態
   const [boards, setBoards] = useState<AACBoard[]>(INITIAL_BOARDS);
