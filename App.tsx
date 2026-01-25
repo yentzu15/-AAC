@@ -113,7 +113,7 @@ const INITIAL_BOARDS: AACBoard[] = [
   }
 ];
 
-const BOARDS_KEY = 'gemini-aac-boards-v3';
+const BOARDS_KEY = 'gemini-aac-boards-v1';
 const UI_KEY = 'gemini-aac-ui-v2';
 const UI_VERSION = 2;
 
@@ -202,20 +202,41 @@ const App: React.FC = () => {
   const [boards, setBoards] = useState<AACBoard[]>(INITIAL_BOARDS);
   const [isLoaded, setIsLoaded] = useState(false); //用來確認資料拿到沒
 
- // 1. APP 啟動時，執行智慧合併 (保留照片 + 更新版面)
+// 1. APP 啟動時，自動搜尋所有可能的舊鑰匙 (v1 -> v2 -> v3)
   useEffect(() => {
-    get(BOARDS_KEY).then((savedData) => {
-      if (savedData) {
-        console.log('發現舊資料，正在執行智慧合併...');
-        // 如果上面有加 smartMerge 函式，這裡就會生效
-        const merged = smartMerge(savedData, INITIAL_BOARDS);
+    const loadData = async () => {
+      console.log('正在搜尋所有版本的資料...');
+      
+      // 🕵️‍♀️ 搜尋順序：先找 v1 (最舊)，再找 v2，最後找 v3
+      // 這樣可以確保如果你以前有照片在 v1，會優先被救回來
+      let data = await get('gemini-aac-boards-v1');
+      
+      if (data) {
+        console.log('找到 v1 的資料了！準備復原...');
+      } else {
+        // 如果 v1 沒資料，找 v2
+        data = await get('gemini-aac-boards-v2');
+        if (data) console.log('找到 v2 的資料了！準備復原...');
+      }
+
+      if (!data) {
+        // 如果 v2 也沒資料，找 v3 (目前的)
+        data = await get('gemini-aac-boards-v3');
+      }
+
+      // 🏁 處理找到的資料
+      if (data) {
+        // 執行智慧合併：保留舊照片 + 加入新版面(時間/疑問詞)
+        const merged = smartMerge(data, INITIAL_BOARDS);
         setBoards(merged);
       } else {
-        // 沒資料就直接用新的
+        // 真的完全沒資料，就用預設值
         setBoards(INITIAL_BOARDS);
       }
       setIsLoaded(true);
-    });
+    };
+
+    loadData();
   }, []);
 
   // 2. 當資料有變動，存回大倉庫
