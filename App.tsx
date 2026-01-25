@@ -552,6 +552,13 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
             <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${mode === 'edit' ? 'translate-x-4' : ''}`}></div>
           </div>
         </label>
+        <button
+  onClick={() => setShowCopyright(true)}
+  className="ml-2 flex items-center gap-1 bg-slate-200 px-3 py-2 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-300 transition"
+>
+  ℹ️ 關於
+</button>
+
       </nav>
 
      {/* Sentence Bar */}
@@ -979,14 +986,7 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         <div className="text-sm font-black text-slate-400">
           目前版面：{activeBoard.name} (頁 {currentPage + 1}/{totalPages})
         </div>
-       {isMobile && (
-  <button
-    onClick={() => setShowCopyright(true)}
-    className="px-3 py-1 text-xs bg-slate-200 rounded-lg font-bold"
-  >
-    ℹ️ 關於
-  </button>
-)}
+       
  
         {mode === 'edit' ? (
           <div className="flex gap-2">
@@ -1032,11 +1032,33 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           </div>
         </label>
 
-        <div className="text-[12px] font-bold text-slate-500">
-          聯絡：yentzu1234@gmail.com
-          Facebook：高高老師語你在一起
-          Instagram：@gaowithyou
-        </div>
+       <div className="space-y-2 text-[12px] font-bold text-slate-500 leading-relaxed">
+
+  <div>
+    📦 版本：v1.0 beta
+  </div>
+
+  <div>
+    🕒 最後更新：2026 / 01 / 25
+  </div>
+
+  <div>
+     Facebook：高高老師語你在一起
+  </div>
+
+  <div>
+     Instagram：@gaowithyou
+  </div>
+
+  <button
+    onClick={() => window.location.href = 'mailto:yentzu1234@gmail.com?subject=AAC回報問題'}
+    className="mt-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs hover:bg-indigo-200 transition"
+  >
+    回報問題 / 建議功能
+  </button>
+
+</div>
+
       </div>
 
       <div className="px-6 py-4 flex gap-3 border-t border-slate-100">
