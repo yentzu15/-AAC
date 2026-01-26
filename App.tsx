@@ -197,8 +197,10 @@ const smartMerge = (savedBoards: AACBoard[], defaultBoards: AACBoard[]): AACBoar
     };
   });
 };
-const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev';
-const BUILD_TIME = import.meta.env.VITE_BUILD_TIME || '';
+const APP_VERSION = '1.0.0';
+
+const BUILD_TIME = new Date().toLocaleDateString();
+
 const App: React.FC = () => {
 const isMobile = useIsMobile();
 
