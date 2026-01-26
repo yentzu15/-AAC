@@ -201,6 +201,8 @@ const smartMerge = (savedBoards: AACBoard[], defaultBoards: AACBoard[]): AACBoar
     };
   });
 };
+const APP_VERSION = import.meta.env.VITE_APP_VERSION || 'dev';
+const BUILD_TIME = import.meta.env.VITE_BUILD_TIME || '';
 const App: React.FC = () => {
 const isMobile = useIsMobile();
 
@@ -1001,12 +1003,17 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
             <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定</button>
             <button onClick={exportSettings} className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">匯出備份</button>
           </div>
-        ) : (
-  <div className="text-[10px] font-bold text-slate-300">
-    <div>© 邱彥慈 語言治療師</div>
-    <div>FB/IG 高高老師語你在一起 @gaowithyou</div>
-  </div>
+       ) : (
+  <>
+    <div className="text-[10px] font-bold text-slate-300">
+      © 邱彥慈 語言治療師
+    </div>
+    <div className="text-[10px] font-bold text-slate-300">
+      FB/IG 高高老師語你在一起 @gaowithyou
+    </div>
+  </>
 )}
+
 
       </footer>
       {showEditWarning && (
@@ -1078,48 +1085,52 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
       </div>
     </div>
   </div>
-)}
+))}
 {showCopyright && (
   <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
     <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
-      <div className="px-6 py-5 bg-slate-50 border-b border-slate-200">
-        <div className="text-xl font-black text-slate-800">關於 / 版權 / 聯絡</div>
-        <div className="text-xs font-bold text-slate-500 mt-1">
-          本工具資料儲存在本機瀏覽器
-        </div>
-      </div>
-
-      <div className="text-xs font-bold text-slate-600 leading-relaxed">
-  提醒：資料存在本機，建議定期匯出 JSON 備份。
-</div>
- {/* 👉 在這裡加「版本資訊」 */}
- <div className="rounded-2xl bg-white border border-slate-200 p-4">
-  <div className="text-sm font-black text-slate-800">版本資訊</div>
-  <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-    版本：v{APP_VERSION}<br />
-    最後更新：{BUILD_TIME}
+     <div className="px-6 py-5 bg-slate-50 border-b border-slate-200">
+  <div className="text-xl font-black text-slate-800">關於 / 版權 / 聯絡</div>
+  <div className="text-xs font-bold text-slate-500 mt-1">
+    本工具資料儲存在本機瀏覽器
   </div>
 </div>
 
+{/* ✅ 這裡開始是內容區：請加這個容器 */}
+<div className="px-6 py-5 space-y-4 text-slate-700">
 
-        <div className="rounded-2xl bg-white border border-slate-200 p-4">
-          <div className="text-sm font-black text-slate-800">Copyright</div>
-          <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-            © 邱彥慈 語言治療師。<br />
-            本工具介面與自製內容（含版面配置、設計、文字整理）受著作權保護。<br />
-            未經授權請勿重製、公開散佈或作商業用途。
-          </div>
-        </div>
+  <div className="text-xs font-bold text-slate-600 leading-relaxed">
+    提醒：資料存在本機，建議定期匯出 JSON 備份。
+  </div>
 
-        <div className="rounded-2xl bg-white border border-slate-200 p-4">
-          <div className="text-sm font-black text-slate-800">聯絡方式</div>
-          <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-            Email：yentzu1234@gmail.com<br />
-            Facebook：高高老師語你在一起<br />
-            Instagram：@gaowithyou
-          </div>
-        </div>
-      </div>
+  <div className="rounded-2xl bg-white border border-slate-200 p-4">
+    <div className="text-sm font-black text-slate-800">版本資訊</div>
+    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+      版本：v{APP_VERSION}<br />
+      最後更新：{BUILD_TIME}
+    </div>
+  </div>
+
+  <div className="rounded-2xl bg-white border border-slate-200 p-4">
+    <div className="text-sm font-black text-slate-800">Copyright</div>
+    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+      © 邱彥慈 語言治療師。<br />
+      本工具介面與自製內容（含版面配置、設計、文字整理）受著作權保護。<br />
+      未經授權請勿重製、公開散佈或作商業用途。
+    </div>
+  </div>
+
+  <div className="rounded-2xl bg-white border border-slate-200 p-4">
+    <div className="text-sm font-black text-slate-800">聯絡方式</div>
+    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+      Email：yentzu1234@gmail.com<br />
+      Facebook：高高老師語你在一起<br />
+      Instagram：@gaowithyou
+    </div>
+  </div>
+
+</div>
+
 
       <div className="px-6 py-4 border-t border-slate-100">
         <button
