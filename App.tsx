@@ -3,10 +3,6 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AACTile, AACBoard, LayoutMode } from './types';
 import { speakText } from './services/geminiService';
 import { get, set } from 'idb-keyval';
-import pkg from '../package.json';
-
-const APP_VERSION = pkg.version;
-const BUILD_TIME = import.meta.env.VITE_BUILD_TIME;
 
 const BOARD_ICONS: Record<string, React.ReactNode> = {
   'board-core': (
@@ -1045,92 +1041,95 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           </div>
         </label>
 
-       <div className="mt-3">
-  <button
-    onClick={() => window.location.href = 'mailto:yentzu1234@gmail.com?subject=AAC回報問題'}
-    className="w-full px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs hover:bg-indigo-200 transition"
-  >
-    回報問題 / 建議功能
-  </button>
-</div>
-
+        <div className="mt-3">
+          <button
+            onClick={() =>
+              (window.location.href =
+                'mailto:yentzu1234@gmail.com?subject=AAC回報問題')
+            }
+            className="w-full px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs hover:bg-indigo-200 transition"
+          >
+            回報問題 / 建議功能
+          </button>
+        </div>
       </div>
 
       <div className="px-6 py-4 flex gap-3 border-t border-slate-100">
         <button
           onClick={() => {
-  setShowEditWarning(false);
-  setEditWarningChecked(false);
-  // 不要 setMode，因為你還沒進 edit
-}}
-
+            setShowEditWarning(false);
+            setEditWarningChecked(false);
+          }}
           className="flex-1 py-3 rounded-2xl bg-slate-100 text-slate-700 font-black active:scale-95"
         >
           取消
         </button>
 
         <button
-  disabled={!editWarningChecked}
-  onClick={() => {
-    setShowEditWarning(false);
-    setMode('edit');
-  }}
-  className={`flex-1 py-3 rounded-2xl font-black text-white active:scale-95 ${
-    editWarningChecked ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-300 cursor-not-allowed'
-  }`}
->
-  我了解，進入編輯
-</button>
-
+          disabled={!editWarningChecked}
+          onClick={() => {
+            setShowEditWarning(false);
+            setMode('edit');
+          }}
+          className={`flex-1 py-3 rounded-2xl font-black text-white active:scale-95 ${
+            editWarningChecked
+              ? 'bg-indigo-600 hover:bg-indigo-700'
+              : 'bg-indigo-300 cursor-not-allowed'
+          }`}
+        >
+          我了解，進入編輯
+        </button>
       </div>
     </div>
   </div>
-))}
+)}
+
 {showCopyright && (
   <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
     <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
-     <div className="px-6 py-5 bg-slate-50 border-b border-slate-200">
-  <div className="text-xl font-black text-slate-800">關於 / 版權 / 聯絡</div>
-  <div className="text-xs font-bold text-slate-500 mt-1">
-    本工具資料儲存在本機瀏覽器
-  </div>
-</div>
+      <div className="px-6 py-5 bg-slate-50 border-b border-slate-200">
+        <div className="text-xl font-black text-slate-800">關於 / 版權 / 聯絡</div>
+        <div className="text-xs font-bold text-slate-500 mt-1">
+          本工具資料儲存在本機瀏覽器
+        </div>
+      </div>
 
-{/* ✅ 這裡開始是內容區：請加這個容器 */}
-<div className="px-6 py-5 space-y-4 text-slate-700">
+      <div className="px-6 py-5 space-y-4 text-slate-700">
+        <div className="text-xs font-bold text-slate-600 leading-relaxed">
+          提醒：資料存在本機，建議定期匯出 JSON 備份。
+        </div>
 
-  <div className="text-xs font-bold text-slate-600 leading-relaxed">
-    提醒：資料存在本機，建議定期匯出 JSON 備份。
-  </div>
+        <div className="rounded-2xl bg-white border border-slate-200 p-4">
+          <div className="text-sm font-black text-slate-800">版本資訊</div>
+          <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+            版本：v{APP_VERSION}
+            <br />
+            最後更新：{BUILD_TIME || '（未設定）'}
+          </div>
+        </div>
 
-  <div className="rounded-2xl bg-white border border-slate-200 p-4">
-    <div className="text-sm font-black text-slate-800">版本資訊</div>
-    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-      版本：v{APP_VERSION}<br />
-      最後更新：{BUILD_TIME}
-    </div>
-  </div>
+        <div className="rounded-2xl bg-white border border-slate-200 p-4">
+          <div className="text-sm font-black text-slate-800">Copyright</div>
+          <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+            © 邱彥慈 語言治療師。
+            <br />
+            本工具介面與自製內容（含版面配置、設計、文字整理）受著作權保護。
+            <br />
+            未經授權請勿重製、公開散佈或作商業用途。
+          </div>
+        </div>
 
-  <div className="rounded-2xl bg-white border border-slate-200 p-4">
-    <div className="text-sm font-black text-slate-800">Copyright</div>
-    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-      © 邱彥慈 語言治療師。<br />
-      本工具介面與自製內容（含版面配置、設計、文字整理）受著作權保護。<br />
-      未經授權請勿重製、公開散佈或作商業用途。
-    </div>
-  </div>
-
-  <div className="rounded-2xl bg-white border border-slate-200 p-4">
-    <div className="text-sm font-black text-slate-800">聯絡方式</div>
-    <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
-      Email：yentzu1234@gmail.com<br />
-      Facebook：高高老師語你在一起<br />
-      Instagram：@gaowithyou
-    </div>
-  </div>
-
-</div>
-
+        <div className="rounded-2xl bg-white border border-slate-200 p-4">
+          <div className="text-sm font-black text-slate-800">聯絡方式</div>
+          <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+            Email：yentzu1234@gmail.com
+            <br />
+            Facebook：高高老師語你在一起
+            <br />
+            Instagram：@gaowithyou
+          </div>
+        </div>
+      </div>
 
       <div className="px-6 py-4 border-t border-slate-100">
         <button
@@ -1143,6 +1142,7 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
     </div>
   </div>
 )}
+
 
     </div>
   );
