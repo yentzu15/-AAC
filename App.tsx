@@ -3,6 +3,11 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AACTile, AACBoard, LayoutMode } from './types';
 import { speakText } from './services/geminiService';
 import { get, set } from 'idb-keyval';
+import pkg from '../package.json';
+
+const APP_VERSION = pkg.version;
+const BUILD_TIME = import.meta.env.VITE_BUILD_TIME;
+
 const BOARD_ICONS: Record<string, React.ReactNode> = {
   'board-core': (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
@@ -995,13 +1000,14 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
             <button onClick={addNewTile} className="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm">新增詞彙</button>
             <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定</button>
             <button onClick={exportSettings} className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">匯出備份</button>
-            <button onClick={() => setMode('standard')} className="bg-green-600 text-white px-8 py-2 rounded-xl text-xs font-bold hover:bg-green-700 transition-colors shadow-sm">完成儲存</button>
           </div>
         ) : (
-          <div className="text-[10px] font-bold text-slate-300">
-        © 邱彥慈 語言治療師｜ FB/IG 高高老師語你在一起 @gaowithyou
-          </div>
-        )}
+  <div className="text-[10px] font-bold text-slate-300">
+    <div>© 邱彥慈 語言治療師</div>
+    <div>FB/IG 高高老師語你在一起 @gaowithyou</div>
+  </div>
+)}
+
       </footer>
       {showEditWarning && (
   <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
@@ -1032,31 +1038,13 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           </div>
         </label>
 
-       <div className="space-y-2 text-[12px] font-bold text-slate-500 leading-relaxed">
-
-  <div>
-    📦 版本：v1.0 beta
-  </div>
-
-  <div>
-    🕒 最後更新：2026 / 01 / 25
-  </div>
-
-  <div>
-     Facebook：高高老師語你在一起
-  </div>
-
-  <div>
-     Instagram：@gaowithyou
-  </div>
-
+       <div className="mt-3">
   <button
     onClick={() => window.location.href = 'mailto:yentzu1234@gmail.com?subject=AAC回報問題'}
-    className="mt-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs hover:bg-indigo-200 transition"
+    className="w-full px-4 py-2 bg-indigo-100 text-indigo-700 rounded-xl font-black text-xs hover:bg-indigo-200 transition"
   >
     回報問題 / 建議功能
   </button>
-
 </div>
 
       </div>
@@ -1101,12 +1089,18 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         </div>
       </div>
 
-      <div className="px-6 py-5 space-y-4 text-slate-700">
-        <div className="text-sm font-bold leading-relaxed space-y-2">
-          <div>• 本工具之版面與資料儲存在此裝置的瀏覽器內（不會自動同步雲端）。</div>
-          <div>• 清除瀏覽器資料、改用其他瀏覽器、換手機/平板，可能導致資料消失。</div>
-          <div>• 建議定期使用「匯出備份（JSON）」保存設定。</div>
-        </div>
+      <div className="text-xs font-bold text-slate-600 leading-relaxed">
+  提醒：資料存在本機，建議定期匯出 JSON 備份。
+</div>
+ {/* 👉 在這裡加「版本資訊」 */}
+ <div className="rounded-2xl bg-white border border-slate-200 p-4">
+  <div className="text-sm font-black text-slate-800">版本資訊</div>
+  <div className="text-xs font-bold text-slate-600 mt-2 leading-relaxed">
+    版本：v{APP_VERSION}<br />
+    最後更新：{BUILD_TIME}
+  </div>
+</div>
+
 
         <div className="rounded-2xl bg-white border border-slate-200 p-4">
           <div className="text-sm font-black text-slate-800">Copyright</div>
