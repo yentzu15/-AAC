@@ -1029,6 +1029,8 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           <div>1) 資料僅儲存在本機瀏覽器，不會自動上傳雲端。</div>
           <div>2) 清除瀏覽器資料／更換裝置／更換瀏覽器，可能導致資料消失。</div>
           <div>3) 每次大量編輯或更新版本前，請先匯出備份（JSON）。</div>
+          <div>4) 編輯模式內所有更動會立即自動處存，編輯完成關閉即可。</div>
+
         </div>
 
         <label className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
