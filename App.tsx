@@ -678,7 +678,7 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>
-        發聲
+        播放
       </button>
     </div>
   </div>
@@ -995,28 +995,60 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
 
 
       </footer>
-      {/* ===== 教學引導視窗 (Tutorial Overlay) ===== */}
+      
+     {/* ===== 教學引導視窗 (Tutorial Overlay) ===== */}
       {showTutorial && (
         <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl relative animate-bounce-in">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl relative animate-bounce-in max-h-[90vh] overflow-y-auto">
             
-            <div className="text-center">
-              <h2 className="text-2xl font-black text-indigo-600 mb-2">歡迎使用 AAC 溝通輔具！</h2>
-              <p className="text-slate-500 font-bold mb-6">簡單三步驟，開始溝通：</p>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-black text-indigo-600 mb-1">歡迎使用 高高老師 溝通輔具！</h2>
+              <p className="text-slate-500 font-bold text-sm">簡單上手，讓溝通無礙</p>
             </div>
 
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+            {/* 三步驟教學 */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-4 bg-indigo-50 p-3 rounded-xl">
                 <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">1</div>
                 <div className="text-slate-700 font-bold text-sm">點擊圖卡，組成句子。</div>
               </div>
-              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+              <div className="flex items-center gap-4 bg-indigo-50 p-3 rounded-xl">
                 <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">2</div>
-                <div className="text-slate-700 font-bold text-sm">點擊上方的<span className="text-red-500 mx-1">紅色圖示</span>可以刪除該詞彙。</div>
+                <div className="text-slate-700 font-bold text-sm">點擊句中的<span className="text-red-500 mx-1">詞彙圖示</span>即可刪除該詞彙。</div>
               </div>
-              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+              <div className="flex items-center gap-4 bg-indigo-50 p-3 rounded-xl">
                 <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">3</div>
-                <div className="text-slate-700 font-bold text-sm">按下「發聲」按鈕，讓它幫你說話！</div>
+                <div className="text-slate-700 font-bold text-sm">按下「播放」按鈕，讓它說話！</div>
+              </div>
+            </div>
+
+            {/* 🔥 新增：安裝教學 (保姆級詳細版) */}
+            <div className="mb-6 bg-amber-50 border-2 border-amber-200 p-4 rounded-xl flex items-start gap-3">
+              <span className="text-2xl mt-1">📱</span>
+              <div className="flex-1">
+                 <h3 className="font-black text-amber-700 text-sm mb-2">💡 小撇步：把這個網頁變成 APP！</h3>
+                 
+                 {/* iOS 教學 */}
+                 <div className="flex items-center flex-wrap gap-1 text-xs font-bold text-slate-700 mb-2 border-b border-amber-200/50 pb-2">
+                   <span className="bg-slate-800 text-white px-1.5 rounded text-[10px] py-0.5">iPhone</span>
+                   <span>用 Safari</span>
+                   <span className="text-xl leading-none">🧭</span>
+                   <span>開啟 ➜ 點下方「分享」</span>
+                   <svg className="w-4 h-4 inline text-blue-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg> 
+                   <span>➜ </span>
+                   <span className="text-amber-700">往下滑</span>
+                   <span> ➜ 加入主畫面</span>
+                 </div>
+
+                 {/* Android 教學 */}
+                 <div className="flex items-center flex-wrap gap-1 text-xs font-bold text-slate-700">
+                   <span className="bg-green-600 text-white px-1.5 rounded text-[10px] py-0.5">Android</span>
+                   <span>用 Chrome</span>
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Google_Chrome_icon_%28February_2022%29.svg" className="w-4 h-4 inline" alt="chrome"/>
+                   <span>開啟 ➜ 點右上「選單」</span>
+                   <span className="text-lg leading-none font-black text-slate-500">⋮</span>
+                   <span>➜ 加到主畫面</span>
+                 </div>
               </div>
             </div>
 
@@ -1039,6 +1071,7 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           </div>
         </div>
       )}
+      
       {showEditWarning && (
   <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
     <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
