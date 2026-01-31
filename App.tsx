@@ -207,7 +207,24 @@ const isMobile = useIsMobile();
   // 設定初始狀態
   const [boards, setBoards] = useState<AACBoard[]>(INITIAL_BOARDS);
   const [isLoaded, setIsLoaded] = useState(false); //用來確認資料拿到沒
+// --- 3. 教學視窗邏輯 (新加入的) ---
+  const [showTutorial, setShowTutorial] = useState(false);
 
+  useEffect(() => {
+    // APP 啟動時檢查：如果是第一次用 (或沒勾選不再顯示)，就跳出教學
+    const hasSeen = localStorage.getItem('aac-tutorial-seen');
+    if (!hasSeen) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const closeTutorial = (dontShowAgain: boolean) => {
+    setShowTutorial(false);
+    if (dontShowAgain) {
+      localStorage.setItem('aac-tutorial-seen', 'true');
+    }
+  };
+  // --------------------------------
 // 1. APP 啟動時，自動搜尋所有可能的舊鑰匙 (v1 -> v2 -> v3)
   useEffect(() => {
     const loadData = async () => {
@@ -605,34 +622,15 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold outline-none"
       />
       
-      {/* 手機版退格鍵：加上圖示 + 防誤觸 */}
-      <button
-        onClick={() => {
-          if (checkDebounce()) {
-            setSentence(prev => prev.slice(0, -1));
-          }
-        }}
-        className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg font-black text-sm flex items-center gap-1 active:scale-95 transition-all"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H10.29z" opacity="0" />
-          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
-          <line x1="18" y1="9" x2="12" y2="15"></line>
-          <line x1="12" y1="9" x2="18" y2="15"></line>
-        </svg>
-        退格
-      </button>
-
-      {/* 手機版發聲鍵：加上圖示 (原本的 handleFullSpeak 已經有防誤觸了) */}
+     {/* 手機版發聲鍵：移除退格鍵，讓此按鈕填滿空間 (flex-1) */}
       <button
         onClick={handleFullSpeak}
-        className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-black text-sm flex items-center gap-1 active:scale-95 transition-all shadow-md"
+        className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg font-black text-lg flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>
-        發聲
+        播放
       </button>
     </div>
   </div>
@@ -672,29 +670,12 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         placeholder="打字…"
         className="w-48 h-full bg-white border-2 border-slate-200 rounded-xl px-4 text-lg font-bold outline-none focus:border-indigo-400 transition-colors"
       />
-     <button
-        onClick={() => setSentence(prev => prev.slice(0, -1))}
-        className="h-full px-6 bg-amber-100 text-amber-700 rounded-xl font-black text-lg hover:bg-amber-200 active:scale-95 transition-all flex items-center gap-2"
-      >
-        {/* 退格圖示 */}
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-           {/* 修正：換成更像退格鍵的圖示 */}
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H10.29z" opacity="0" />
-          <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
-          <line x1="18" y1="9" x2="12" y2="15"></line>
-          <line x1="12" y1="9" x2="18" y2="15"></line>
-        </svg>
-        修正
-      </button>
+   {/* 移除修正按鈕，只留發聲按鈕並加寬 */}
       <button
         onClick={handleFullSpeak}
-        className="h-full px-8 bg-indigo-600 text-white rounded-xl font-black text-xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2"
+        className="h-full px-12 bg-indigo-600 text-white rounded-xl font-black text-2xl shadow-lg hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-3"
       >
-        {/* 發聲圖示 (喇叭) */}
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
         </svg>
         發聲
@@ -1014,6 +995,50 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
 
 
       </footer>
+      {/* ===== 教學引導視窗 (Tutorial Overlay) ===== */}
+      {showTutorial && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl relative animate-bounce-in">
+            
+            <div className="text-center">
+              <h2 className="text-2xl font-black text-indigo-600 mb-2">歡迎使用 AAC 溝通輔具！</h2>
+              <p className="text-slate-500 font-bold mb-6">簡單三步驟，開始溝通：</p>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+                <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">1</div>
+                <div className="text-slate-700 font-bold text-sm">點擊圖卡，組成句子。</div>
+              </div>
+              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+                <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">2</div>
+                <div className="text-slate-700 font-bold text-sm">點擊上方的<span className="text-red-500 mx-1">紅色圖示</span>可以刪除該詞彙。</div>
+              </div>
+              <div className="flex items-center gap-4 bg-indigo-50 p-4 rounded-xl">
+                <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">3</div>
+                <div className="text-slate-700 font-bold text-sm">按下「發聲」按鈕，讓它幫你說話！</div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => closeTutorial(false)}
+                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform"
+              >
+                我知道了，開始使用！
+              </button>
+              
+              <button 
+                onClick={() => closeTutorial(true)}
+                className="text-slate-400 text-xs font-bold hover:text-slate-600 py-2"
+              >
+                不再顯示此教學 (我是熟練的使用者)
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
       {showEditWarning && (
   <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
     <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
