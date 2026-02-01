@@ -1014,8 +1014,9 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
               </div>
               <div className="flex items-center gap-4 bg-indigo-50 p-3 rounded-xl">
                 <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">2</div>
-                <div className="text-slate-700 font-bold text-sm">點擊句中的<span className="text-red-500 mx-1">詞彙圖示</span>即可刪除該詞彙。</div>
-              </div>
+               <div className="text-slate-700 font-bold text-sm">
+  覺得選錯了嗎？<span className="text-indigo-600 font-black mx-1">直接點擊</span>句條上的圖卡，就能把它刪掉喔！
+</div>
               <div className="flex items-center gap-4 bg-indigo-50 p-3 rounded-xl">
                 <div className="bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0">3</div>
                 <div className="text-slate-700 font-bold text-sm">按下「播放」按鈕，讓它說話！</div>
