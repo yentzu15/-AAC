@@ -224,6 +224,38 @@ const isMobile = useIsMobile();
       localStorage.setItem('aac-tutorial-seen', 'true');
     }
   };
+  // --- 4. 復原功能 (Undo) ---
+  const [history, setHistory] = useState<string[]>([]);
+  const [isUndoing, setIsUndoing] = useState(false);
+  const prevBoardsRef = useRef<string>('');
+
+  // 監聽 boards 變動，自動存入歷史紀錄 (最多記憶 20 步)
+  useEffect(() => {
+    if (!isLoaded) return; // 確保資料讀取完畢才開始紀錄
+
+    const currentStr = JSON.stringify(boards);
+    if (!prevBoardsRef.current) {
+      prevBoardsRef.current = currentStr;
+      return;
+    }
+    
+    if (isUndoing) {
+      setIsUndoing(false); // 如果是正在執行復原，就不重複紀錄
+    } else if (prevBoardsRef.current !== currentStr) {
+      setHistory(h => [...h, prevBoardsRef.current].slice(-20)); 
+    }
+    prevBoardsRef.current = currentStr;
+  }, [boards, isLoaded, isUndoing]);
+
+  const handleUndo = () => {
+    if (history.length > 0) {
+      setIsUndoing(true); // 標記正在復原中
+      const prevStateStr = history[history.length - 1]; // 拿出上一步的狀態
+      setHistory(h => h.slice(0, -1)); // 從歷史紀錄中移除最後一步
+      setBoards(JSON.parse(prevStateStr)); // 恢復畫面
+    }
+  };
+  // -------------------------
   // --------------------------------
 // 1. APP 啟動時，自動搜尋所有可能的舊鑰匙 (v1 -> v2 -> v3)
   useEffect(() => {
@@ -996,13 +1028,26 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
         </div>
        
  
-        {mode === 'edit' ? (
-          <div className="flex gap-2">
-            <button onClick={deleteCurrentBoard} className="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors shadow-sm">刪除此版面</button>
-            <button onClick={addNewBoard} className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm">新增版面</button>
-            <button onClick={addNewTile} className="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm">新增詞彙</button>
-            <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm">匯入設定</button>
-            <button onClick={exportSettings} className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm">匯出備份</button>
+       {mode === 'edit' ? (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
+            {/* 🔥 新增：復原按鈕 */}
+            <button 
+              onClick={handleUndo} 
+              disabled={history.length === 0}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors shadow-sm flex items-center gap-1 shrink-0 ${
+                history.length > 0 
+                  ? 'bg-amber-500 text-white hover:bg-amber-600 active:scale-95' 
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              ↩ 復原
+            </button>
+
+            <button onClick={deleteCurrentBoard} className="bg-rose-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-600 transition-colors shadow-sm shrink-0">刪除此版面</button>
+            <button onClick={addNewBoard} className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-sm shrink-0">新增版面</button>
+            <button onClick={addNewTile} className="bg-sky-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-sky-600 transition-colors shadow-sm shrink-0">新增詞彙</button>
+            <button onClick={importSettings} className="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-black transition-colors shadow-sm shrink-0">匯入設定</button>
+            <button onClick={exportSettings} className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors shadow-sm shrink-0">匯出備份</button>
           </div>
        ) : (
   <>
