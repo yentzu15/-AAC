@@ -883,7 +883,29 @@ const BTN_H_VH = 15;   // YES/NO 高度(vh) 先用 15
           ✕
         </button>
       )}
-
+{/* 🔥 補上這裡：讓平板與電腦版也能點擊箭頭移動！ */}
+      {mode === 'edit' && (
+        <div className="absolute top-2 left-2 flex gap-1 z-50">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              moveTileByStep(tile.id, -1);
+            }}
+            className="px-2 py-1 rounded-md bg-slate-900/80 text-white text-xs font-black hover:bg-slate-700 active:scale-95"
+          >
+            ◀
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              moveTileByStep(tile.id, 1);
+            }}
+            className="px-2 py-1 rounded-md bg-slate-900/80 text-white text-xs font-black hover:bg-slate-700 active:scale-95"
+          >
+            ▶
+          </button>
+        </div>
+      )}
       <div className="w-full flex-1 min-h-0 flex items-center justify-center">
         {tile.imageUrl ? (
           <img
