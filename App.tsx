@@ -257,30 +257,26 @@ const isMobile = useIsMobile();
   };
   // -------------------------
   // --------------------------------
-// 1. APP 啟動時，自動搜尋所有可能的舊鑰匙 (v1 -> v2 -> v3)
+// 1. APP 啟動時，讀取最新資料 (解決更新頁面就不見的問題)
   useEffect(() => {
     const loadData = async () => {
       console.log('正在搜尋所有版本的資料...');
-      
-      // 🕵️‍♀️ 搜尋順序：先找 v1 (最舊)，再找 v2，最後找 v3
-      let data = await get('gemini-aac-boards-v1');
+      // 🕵️‍♀️ 搜尋順序修正：直接先找最新的 v3！沒有才往下找舊的，這樣編輯才不會被舊資料蓋掉
+      let data = await get('gemini-aac-boards-v3');
       
       if (!data) {
         data = await get('gemini-aac-boards-v2');
       }
-
+      
       if (!data) {
-        data = await get('gemini-aac-boards-v3');
+        data = await get('gemini-aac-boards-v1');
       }
 
-      // 🏁 處理找到的資料
       if (data) {
         console.log('找到資料了！正在執行合併...');
-        // 🔥 這裡會呼叫你上面寫好的 smartMerge
         const merged = smartMerge(data, INITIAL_BOARDS);
         setBoards(merged);
       } else {
-        // 真的完全沒資料，就用預設值
         setBoards(INITIAL_BOARDS);
       }
       setIsLoaded(true);
