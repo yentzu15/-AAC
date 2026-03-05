@@ -257,26 +257,27 @@ const isMobile = useIsMobile();
   };
   // -------------------------
   // --------------------------------
-// 1. APP 啟動時，讀取最新資料 (解決更新頁面就不見的問題)
+// 1. APP 啟動時，讀取最新資料（修正版本：完全以使用者存檔為主，不再強制合併舊資料）
   useEffect(() => {
     const loadData = async () => {
-      console.log('正在搜尋所有版本的資料...');
-      // 🕵️‍♀️ 搜尋順序修正：直接先找最新的 v3！沒有才往下找舊的，這樣編輯才不會被舊資料蓋掉
-      let data = await get('gemini-aac-boards-v3');
-      
-      if (!data) {
-        data = await get('gemini-aac-boards-v2');
-      }
-      
-      if (!data) {
-        data = await get('gemini-aac-boards-v1');
-      }
+      try {
+        console.log('正在搜尋您的專屬版面設定...');
+        // 🕵️‍♀️ 搜尋順序：直接找最新版本，沒資料才往舊版本找
+        let data = await get('gemini-aac-boards-v3');
+        if (!data) data = await get('gemini-aac-boards-v2');
+        if (!data) data = await get('gemini-aac-boards-v1');
 
-      if (data) {
-        console.log('找到資料了！正在執行合併...');
-        const merged = smartMerge(data, INITIAL_BOARDS);
-        setBoards(merged);
-      } else {
+        if (data && Array.isArray(data) && data.length > 0) {
+          console.log('找到您的專屬設定，正在載入...');
+          // 🌟 關鍵改動：只要有存檔，就完全用存檔的資料，不再執行 smartMerge
+          // 這樣你刪除的詞彙才不會因為比對原始版面又跑回來
+          setBoards(data);
+        } else {
+          console.log('完全沒有存檔紀錄，載入預設初始版面。');
+          setBoards(INITIAL_BOARDS);
+        }
+      } catch (err) {
+        console.error('資料載入失敗：', err);
         setBoards(INITIAL_BOARDS);
       }
       setIsLoaded(true);
@@ -285,7 +286,7 @@ const isMobile = useIsMobile();
     loadData();
   }, []);
 
-  // 2. 當資料有變動，存回大倉庫
+  // 2. 當資料有變動，存回大倉庫（確保新詞彙、新版面能被記住）
   useEffect(() => {
     if (isLoaded) {
       set(BOARDS_KEY, boards).catch(err => console.error('儲存失敗', err));
