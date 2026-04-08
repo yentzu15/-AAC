@@ -16,8 +16,8 @@ const BOARD_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const YES_TILE: AACTile = { id: 'fixed-yes', text: '是', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Approve_icon.svg/512px-Approve_icon.svg.png' };
-const NO_TILE: AACTile = { id: 'fixed-no', text: '不是', imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Cross_red_circle.svg/512px-Cross_red_circle.svg.png' };
+const YES_TILE: AACTile = { id: 'fixed-yes', text: '是', imageUrl: '/icons/yes.jpg' };
+const NO_TILE: AACTile = { id: 'fixed-no', text: '不是', imageUrl: '/icons/no.jpg' };
 
 const INITIAL_BOARDS: AACBoard[] = [
   {
