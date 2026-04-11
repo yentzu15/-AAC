@@ -4,13 +4,37 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 /**
- * Text-to-speech using browser's SpeechSynthesis (fallback/primary for quick response)
+ * 強化版發聲：優先嘗試本機，失敗自動切換雲端 (支援華為與各類平板)
  */
 export const speakText = (text: string) => {
   if (!text) return;
+
+  // 🔴 標記 A：強制清除之前的阻塞 (解決連點沒聲音)
+  window.speechSynthesis.cancel();
+
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-TW';
-  utterance.rate = 0.5;
+  utterance.rate = 0.8; // 稍微加快，聽起來更像真人
+
+  // 🔴 標記 B：準備「雲端後援」 (免費的 Google 語音)
+  const cloudUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=zh-TW&client=tw-ob`;
+  const audio = new Audio(cloudUrl);
+
+  // 🔴 標記 C：設定監測開關
+  let hasStarted = false;
+  utterance.onstart = () => {
+    hasStarted = true;
+  };
+
+  // 🔴 標記 D：0.5 秒檢查哨 (如果華為系統裝死沒反應，就改播雲端音檔)
+  setTimeout(() => {
+    if (!hasStarted) {
+      window.speechSynthesis.cancel(); 
+      audio.play().catch(err => console.error("雲端發聲失敗：", err));
+      console.log("偵測到本機發聲失效，已切換雲端備援");
+    }
+  }, 500);
+
   window.speechSynthesis.speak(utterance);
 };
 
