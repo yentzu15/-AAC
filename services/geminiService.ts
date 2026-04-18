@@ -16,8 +16,8 @@ export const speakText = (text: string) => {
   utterance.lang = 'zh-TW';
   utterance.rate = 0.8; // 稍微加快，聽起來更像真人
 
-  // 🔴 標記 B：準備「雲端後援」 (免費的 Google 語音)
-  const cloudUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=zh-TW&client=tw-ob`;
+    // 🔴 關鍵修改：改用有道語音 API，中國大陸免翻牆且華為可用
+  const cloudUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=zh`;
   const audio = new Audio(cloudUrl);
 
   // 🔴 標記 C：設定監測開關
