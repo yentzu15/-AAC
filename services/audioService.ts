@@ -3,14 +3,23 @@ import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 // ─── 全域音軌 ───
-const globalAudio = new Audio();
+// 一個最小的合法靜音 WAV 檔（base64），確保 play() 成功、真正解鎖音訊權限
+const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+const globalAudio = new Audio(SILENT_WAV);
 let _unlocked = false;
 
 export const unlockAudio = () => {
   if (_unlocked) return;
   _unlocked = true;
-  globalAudio.play().catch(() => {});
+  // 用有效的靜音音訊做第一次播放，讓瀏覽器真的記住「你被授權了」
+  globalAudio.play().then(() => {
+    console.log('[TTS] 音訊權限解鎖成功');
+  }).catch((e) => {
+    console.warn('[TTS] 音訊解鎖失敗，後續播放可能受限：', e);
+  });
 };
+
 
 export const prewarmAudioCache = async () => {};
 export const cacheNewWord = async () => {};
