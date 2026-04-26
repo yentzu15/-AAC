@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AACTile, AACBoard, LayoutMode } from './types';
-import { speakText } from './services/geminiService';
+import { speakText, cacheNewWord, prewarmAudioCache, unlockAudio } from './services/audioService';
 import { get, set } from 'idb-keyval';
 
 const BOARD_ICONS: Record<string, React.ReactNode> = {
@@ -202,6 +202,11 @@ const APP_VERSION = '1.0.0';
 const BUILD_TIME = new Date().toLocaleDateString();
 
 const App: React.FC = () => {
+    // 🔥 點擊全域任意處解鎖聲音權限
+  useEffect(() => {
+    document.addEventListener('click', unlockAudio, { once: true });
+  }, []);
+
 const isMobile = useIsMobile();
 
   // 設定初始狀態
@@ -267,19 +272,24 @@ const isMobile = useIsMobile();
         if (!data) data = await get('gemini-aac-boards-v2');
         if (!data) data = await get('gemini-aac-boards-v1');
 
-        if (data && Array.isArray(data) && data.length > 0) {
+                if (data && Array.isArray(data) && data.length > 0) {
           console.log('找到您的專屬設定，正在載入...');
           // 🌟 關鍵改動：只要有存檔，就完全用存檔的資料，不再執行 smartMerge
           // 這樣你刪除的詞彙才不會因為比對原始版面又跑回來
           setBoards(data);
+          prewarmAudioCache(data.flatMap((b: any) => b.tiles.map((t: any) => t.text)));
         } else {
           console.log('完全沒有存檔紀錄，載入預設初始版面。');
           setBoards(INITIAL_BOARDS);
+          prewarmAudioCache(INITIAL_BOARDS.flatMap((b: any) => b.tiles.map((t: any) => t.text)));
         }
       } catch (err) {
         console.error('資料載入失敗：', err);
         setBoards(INITIAL_BOARDS);
+        prewarmAudioCache(INITIAL_BOARDS.flatMap((b: any) => b.tiles.map((t: any) => t.text)));
       }
+
+    
       setIsLoaded(true);
     };
 
@@ -356,12 +366,14 @@ const [editWarningChecked, setEditWarningChecked] = useState(false);
   };
 
 
-  const handleTextChange = (id: string, newText: string) => {
+    const handleTextChange = (id: string, newText: string) => {
     setBoards(prev => prev.map(b => ({
       ...b,
       tiles: b.tiles.map(t => t.id === id ? { ...t, text: newText } : t)
     })));
+    cacheNewWord(newText);
   };
+
 
   const deleteTile = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
