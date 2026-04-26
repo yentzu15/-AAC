@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-// ─── 全域音軌 (徹底解決行動端阻擋問題) ───
+// ─── 全域音軌 ───
 const globalAudio = new Audio();
 let _unlocked = false;
 
@@ -12,70 +12,64 @@ export const unlockAudio = () => {
   globalAudio.play().catch(() => {});
 };
 
-// ─── 華為專用：外接 API 救援機制 ───
-const playWithAPI = async (text: string) => {
-  console.log("偵測到無原生引擎，啟動 API 救援機制");
-  
-  // 第一道救援：Google 網頁翻譯 API (速度極快、每個人都免費)
-  const safeText = encodeURIComponent(text.substring(0, 200).replace(/\n/g, '，'));
-  const googleUrl = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-TW&q=${safeText}`;
-  globalAudio.src = googleUrl;
-
-  globalAudio.play().catch(async (err) => {
-    console.warn("Google 翻譯 API 也被擋，啟動最後防線 Gemini API...", err);
-    // 第二道救援：如果連 Google 網址都被網路封鎖，才動用你的 Gemini API
-    try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-tts',
-        contents: [{ parts: [{ text }] }],
-        config: {
-          responseModalities: ['AUDIO'],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } }
-        } as any,
-      });
-      const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-      if (part?.inlineData) {
-        globalAudio.src = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-        globalAudio.play().catch(console.error);
-      }
-    } catch (geminiErr) {
-      console.error("[TTS] 所有發聲方式皆失敗：", geminiErr);
-    }
-  });
-};
-
-
-// ─── API 對接口 (因為不快取了，保留空殼讓 App.tsx 不會報錯) ───
 export const prewarmAudioCache = async () => {};
 export const cacheNewWord = async () => {};
 
+// ─── 華為專用 Gemini API 救援 ───
+const playWithGemini = async (text: string) => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-preview-tts',
+      contents: [{ parts: [{ text }] }],
+      config: {
+        responseModalities: ['AUDIO'],
+        speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } }
+      } as any,
+    });
+    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    if (part?.inlineData) {
+      globalAudio.src = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+      globalAudio.currentTime = 0;
+      globalAudio.play().catch(console.error);
+    }
+  } catch (err) {
+    console.error("[TTS] Gemini 也失敗了：", err);
+  }
+};
 
-// ─── 智慧分配發聲引擎 ───
+// ─── 主發聲函式 ───
 export const speakText = async (text: string): Promise<void> => {
   if (!text) return;
 
-  // 1. 強制清除前一個講到一半的話
   window.speechSynthesis.cancel();
-  
-  // 2. 建立 Chrome / Safari / iOS 共用的原生發音系統 (免費零延遲)
+
+  // 等待聲音列表載入（Chrome 需要這個）
+  await new Promise<void>(resolve => {
+    if (speechSynthesis.getVoices().length > 0) {
+      resolve();
+    } else {
+      speechSynthesis.onvoiceschanged = () => resolve();
+      setTimeout(resolve, 1000); // 最多等 1 秒
+    }
+  });
+
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-TW';
   utterance.rate = 0.8;
-  
+
   let nativeStarted = false;
-  utterance.onstart = () => {
-    nativeStarted = true;
-  };
-  
-  // 3. 嘗試原生發聲
+  utterance.onstart = () => { nativeStarted = true; };
+
   window.speechSynthesis.speak(utterance);
 
-  // 4. 華為檢測機制：如果 300 毫秒內，原生引擎像死機一樣沒有觸發 onstart
+  // ⭐️ 關鍵修正：等 1000ms（不是 300ms）
+  // Chrome 有時需要 500-800ms 才觸發 onstart，1 秒才是安全線
+  // 同時檢查「有沒有開始」以及「有沒有正在說話」雙保險
   setTimeout(() => {
-    if (!nativeStarted) {
-      window.speechSynthesis.cancel(); // 關閉卡死的原生引擎
-      playWithAPI(text); // 放出華為專用救援 API
+    if (!nativeStarted && !window.speechSynthesis.speaking) {
+      console.log("[TTS] 原生引擎確認失敗，切換到 Gemini");
+      window.speechSynthesis.cancel();
+      playWithGemini(text);
     }
-  }, 300);
+  }, 1000);
 };
-
