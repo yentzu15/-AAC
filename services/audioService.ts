@@ -1,101 +1,81 @@
 import { GoogleGenAI } from "@google/genai";
 
-// 這裡抓取你原本環境變數的 API_KEY
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-// ─── IndexedDB 快取層 ───────────────────────────────────────────────
-const DB_NAME = 'aac-tts-cache';
-const STORE = 'audio';
-
-const openDB = (): Promise<IDBDatabase> =>
-  new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1);
-    req.onupgradeneeded = (e) => {
-      const db = (e.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE);
-      }
-    };
-    req.onsuccess = e => resolve((e.target as IDBOpenDBRequest).result);
-    req.onerror = () => reject(req.error);
-  });
-
-const dbGet = async (key: string): Promise<string | null> => {
-  const db = await openDB();
-  return new Promise(resolve => {
-    const req = db.transaction(STORE).objectStore(STORE).get(key);
-    req.onsuccess = () => resolve(req.result ?? null);
-    req.onerror = () => resolve(null);
-  });
-};
-
-const dbSet = async (key: string, value: string): Promise<void> => {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).put(value, key);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-};
-
-// ─── Gemini TTS 生成 ────────────────────────────────────────────────
-const generateAudio = async (text: string): Promise<string | null> => {
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-tts',
-      contents: [{ parts: [{ text }] }],
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-        },
-      } as any,
-    });
-
-    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-    if (!part?.inlineData) return null;
-
-    const dataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-    await dbSet(text, dataUrl);
-    return dataUrl;
-  } catch (err) {
-    console.error('[TTS] 生成失敗：', err);
-    return null;
-  }
-};
-
-// ─── 自動播放解鎖（針對華為與行動裝置設計）──
+// ─── 全域音軌 (徹底解決行動端阻擋問題) ───
+const globalAudio = new Audio();
 let _unlocked = false;
+
 export const unlockAudio = () => {
   if (_unlocked) return;
   _unlocked = true;
-  const a = new Audio();
-  a.play().catch(() => {});
+  globalAudio.play().catch(() => {});
 };
 
-// ─── 公開 API ───────────────────────────────────────────────────────
-export const prewarmAudioCache = async (allTexts: string[]): Promise<void> => {
-  for (const text of allTexts) {
-    if (!text) continue;
-    const cached = await dbGet(text);
-    if (!cached) await generateAudio(text);
-  }
+// ─── 華為專用：外接 API 救援機制 ───
+const playWithAPI = async (text: string) => {
+  console.log("偵測到無原生引擎，啟動 API 救援機制");
+  
+  // 第一道救援：Google 網頁翻譯 API (速度極快、每個人都免費)
+  const safeText = encodeURIComponent(text.substring(0, 200).replace(/\n/g, '，'));
+  const googleUrl = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&tl=zh-TW&q=${safeText}`;
+  globalAudio.src = googleUrl;
+
+  globalAudio.play().catch(async (err) => {
+    console.warn("Google 翻譯 API 也被擋，啟動最後防線 Gemini API...", err);
+    // 第二道救援：如果連 Google 網址都被網路封鎖，才動用你的 Gemini API
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-tts',
+        contents: [{ parts: [{ text }] }],
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } }
+        } as any,
+      });
+      const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+      if (part?.inlineData) {
+        globalAudio.src = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+        globalAudio.play().catch(console.error);
+      }
+    } catch (geminiErr) {
+      console.error("[TTS] 所有發聲方式皆失敗：", geminiErr);
+    }
+  });
 };
 
-export const cacheNewWord = async (text: string): Promise<void> => {
-  if (!text || await dbGet(text)) return;
-  await generateAudio(text);
-};
 
+// ─── API 對接口 (因為不快取了，保留空殼讓 App.tsx 不會報錯) ───
+export const prewarmAudioCache = async () => {};
+export const cacheNewWord = async () => {};
+
+
+// ─── 智慧分配發聲引擎 ───
 export const speakText = async (text: string): Promise<void> => {
   if (!text) return;
-  let dataUrl = await dbGet(text);
-  if (!dataUrl) {
-    dataUrl = await generateAudio(text);
-  }
-  if (dataUrl) {
-    const audio = new Audio(dataUrl);
-    audio.play().catch(err => console.error('[TTS] 播放失敗：', err));
-  }
+
+  // 1. 強制清除前一個講到一半的話
+  window.speechSynthesis.cancel();
+  
+  // 2. 建立 Chrome / Safari / iOS 共用的原生發音系統 (免費零延遲)
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'zh-TW';
+  utterance.rate = 0.8;
+  
+  let nativeStarted = false;
+  utterance.onstart = () => {
+    nativeStarted = true;
+  };
+  
+  // 3. 嘗試原生發聲
+  window.speechSynthesis.speak(utterance);
+
+  // 4. 華為檢測機制：如果 300 毫秒內，原生引擎像死機一樣沒有觸發 onstart
+  setTimeout(() => {
+    if (!nativeStarted) {
+      window.speechSynthesis.cancel(); // 關閉卡死的原生引擎
+      playWithAPI(text); // 放出華為專用救援 API
+    }
+  }, 300);
 };
+
