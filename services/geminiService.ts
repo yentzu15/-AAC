@@ -9,38 +9,37 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 export const speakText = (text: string) => {
   if (!text) return;
 
-  // 1. 強制清除之前的阻塞，確保連點時聲音不會卡死
+  // 1. 強制清除所有正在排隊的語音
   window.speechSynthesis.cancel();
 
+  // 2. 建立原生語音物件 (設定稍微放慢一點，提升成功率)
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'zh-TW';
-  utterance.rate = 0.8; 
+  utterance.rate = 0.7; 
 
-  // 2. 準備雙重雲端後援：有道語音 (大陸免翻牆) 與 Google 語音
-  const cloudUrl1 = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=zh`;
-  const cloudUrl2 = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=zh-TW&client=tw-ob`;
-  
-  const audio1 = new Audio(cloudUrl1);
-  const audio2 = new Audio(cloudUrl2);
+  // 3. 準備雲端音源 (這是不依賴平板 TTS 引擎的「純音檔」方式)
+  const cloudUrl = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&le=zh`;
+  const backupAudio = new Audio(cloudUrl);
 
-  let hasStarted = false;
+  let nativeStarted = false;
+
+  // 如果原生 TTS 成功啟動，標記為 true
   utterance.onstart = () => {
-    hasStarted = true;
+    nativeStarted = true;
+    console.log("原生 TTS 成功啟動");
   };
 
-  // 3. 延長檢查哨時間至 0.8 秒：給華為系統足夠的時間初始化語音引擎
+  // 4. 關鍵保險絲：縮短判定時間至 300ms
+  // 如果華為引擎 0.3 秒內沒反應，立刻強行播放雲端音檔，不等了！
   setTimeout(() => {
-    if (!hasStarted) {
-      window.speechSynthesis.cancel(); 
-      // 嘗試第一後援：有道
-      audio1.play().catch(() => {
-        // 若失敗，嘗試第二後援：Google
-        audio2.play().catch(err => console.error("所有雲端發聲管道皆失敗：", err));
-      });
-      console.log("偵測到本機發聲失效，已啟用雙重雲端救援模式");
+    if (!nativeStarted) {
+      window.speechSynthesis.cancel(); // 掐斷那個卡住的原生引擎
+      backupAudio.play().catch(err => console.error("連雲端救援都失敗，請檢查網路:", err));
+      console.log("TTS 引擎卡死，已強行切換至雲端播放");
     }
-  }, 800); // 👈 這裡是針對華為反應慢的關鍵修正
+  }, 300);
 
+  // 啟動原生嘗試
   window.speechSynthesis.speak(utterance);
 };
 
